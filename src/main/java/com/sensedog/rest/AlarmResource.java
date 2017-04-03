@@ -3,6 +3,7 @@ package com.sensedog.rest;
 import com.sensedog.rest.entry.request.AlarmCreateRequest;
 import com.sensedog.rest.entry.request.DetectRequest;
 import com.sensedog.rest.entry.response.TokenResponse;
+import com.sensedog.security.Token;
 import com.sensedog.service.AlarmService;
 import org.apache.http.auth.AuthenticationException;
 
@@ -47,7 +48,7 @@ public class AlarmResource {
     @Path("detection")
     public Response detect(@Valid DetectRequest request,
                            @HeaderParam("alarm-auth-token") String authToken) throws AuthenticationException {
-        alarmService.detect(authToken, request.getDetectionType(), request.getValue());
+        alarmService.detect(new Token.Alarm(authToken), request.getDetectionType(), request.getValue());
         return Response.noContent().build();
     }
 }

@@ -7,10 +7,11 @@ import com.sensedog.repository.PinCodeRepository;
 import com.sensedog.repository.ServiceRepository;
 import com.sensedog.repository.SubscriberRepository;
 import com.sensedog.rest.AlarmResource;
-import com.sensedog.rest.MasterUserResource;
+import com.sensedog.rest.MasterResource;
 import com.sensedog.rest.StatusResource;
 import com.sensedog.security.SecurityManager;
 import com.sensedog.service.AlarmService;
+import com.sensedog.service.StatusService;
 import com.sensedog.service.UserService;
 import com.sensedog.transmit.CloudClient;
 import com.sensedog.transmit.MailClient;
@@ -31,7 +32,7 @@ class SystemBootstrap extends ResourceConfig {
 
     SystemBootstrap(@Context ServiceLocator locator) {
         register(AlarmResource.class);
-        register(MasterUserResource.class);
+        register(MasterResource.class);
         register(StatusResource.class);
         register(JacksonFeature.class);
 
@@ -60,6 +61,7 @@ class SystemBootstrap extends ResourceConfig {
                 bind(PinCodeRepository.class).to(PinCodeRepository.class).in(Singleton.class);
                 bind(SubscriberRepository.class).to(SubscriberRepository.class).in(Singleton.class);
                 bind(SecurityManager.class).to(SecurityManager.class).in(Singleton.class);
+                bind(StatusService.class).to(StatusService.class).in(Singleton.class);
             }
         });
     }

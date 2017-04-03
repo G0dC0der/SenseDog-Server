@@ -56,7 +56,7 @@ CREATE TABLE subscriber (
     notify_regularity   INT,
     last_notification   TIMESTAMP,
     minimum_severity    VARCHAR(255),
-    unsubscribe_key     VARCHAR(255) NOT NULL
+    security_key     VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE subscriber_capability (

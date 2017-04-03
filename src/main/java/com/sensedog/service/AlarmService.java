@@ -6,6 +6,7 @@ import com.sensedog.detection.Severity;
 import com.sensedog.repository.AlarmDeviceRepository;
 import com.sensedog.repository.DetectionRepository;
 import com.sensedog.repository.ServiceRepository;
+import com.sensedog.repository.SubscriberRepository;
 import com.sensedog.repository.entry.AlarmDevice;
 import com.sensedog.repository.entry.Detection;
 import com.sensedog.repository.entry.PinCode;
@@ -14,13 +15,13 @@ import com.sensedog.repository.entry.Subscriber;
 import com.sensedog.security.Capability;
 import com.sensedog.security.Cipher;
 import com.sensedog.security.SecurityManager;
-import com.sensedog.security.UnauthorizedException;
+import com.sensedog.security.Token;
 import com.sensedog.system.SystemStatus;
 import com.sensedog.transmit.CloudClient;
 import com.sensedog.transmit.MailClient;
 
 import javax.inject.Inject;
-import java.time.Duration;
+import javax.ws.rs.BadRequestException;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ public class AlarmService {
     private final ServiceRepository serviceRepository;
     private final DetectionRepository detectionRepository;
     private final AlarmDeviceRepository alarmDeviceRepository;
+    private final SubscriberRepository subscriberRepository;
     private final SecurityManager securityManager;
     private final MailClient mailClient;
     private final CloudClient cloudClient;
@@ -38,12 +40,14 @@ public class AlarmService {
     public AlarmService(final ServiceRepository serviceRepository,
                         final DetectionRepository detectionRepository,
                         final AlarmDeviceRepository alarmDeviceRepository,
+                        final SubscriberRepository subscriberRepository,
                         final SecurityManager securityManager,
                         final MailClient mailClient,
                         final CloudClient cloudClient) {
         this.serviceRepository = serviceRepository;
         this.detectionRepository = detectionRepository;
         this.alarmDeviceRepository = alarmDeviceRepository;
+        this.subscriberRepository = subscriberRepository;
         this.securityManager = securityManager;
         this.mailClient = mailClient;
         this.cloudClient = cloudClient;
@@ -58,7 +62,7 @@ public class AlarmService {
 
         Service service = new Service();
         service.setCreationDate(ZonedDateTime.now());
-        service.setStatus(SystemStatus.IN_MOTION);
+        service.setStatus(SystemStatus.ACTIVE);
 
         PinCode pinCode = new PinCode();
         pinCode.setPinCode(Cipher.pinCode());
@@ -83,10 +87,15 @@ public class AlarmService {
         return alarmDevice.getAuthToken();
     }
 
-    //TODO: This method should NOT see if PP is within the safe radius. That should the OP do before doing a request to the detection end point
-    public void detect(String authToken, DetectionType detectionType, String value) {
-        Service service = securityManager.authorize(authToken);
-        service.setStatus(SystemStatus.IN_MOTION); //TODO: Denna sparas ej
+    public void detect(Token.Alarm token,
+                       DetectionType detectionType,
+                       String value) {
+        Service service = securityManager.authenticate(token);
+        service.setStatus(SystemStatus.ACTIVE); //TODO: Denna sparas ej
+
+        if (service.getMasterUser() == null) {
+            throw new BadRequestException("Can not broadcast a detection master user absence.");
+        }
 
         Severity severity = securityManager.determineSeverity(service, detectionType);
 
@@ -117,12 +126,12 @@ public class AlarmService {
             //Call text
         }
 
-        //TODO: Don't forget to update "lastNotification"
+        subscriberRepository.updateLastNotifications(warningReceivers, detection.getDetectionDate());
     }
 
     private void mailTo(Service service, Detection detection, List<Subscriber> receivers) {
         receivers.stream()
-                .filter(securityManager::mailCapable)
+                .filter(subscriber -> securityManager.hasCapability(subscriber, Capability.MAIL_READER))
                 .map(subscriber -> DetectionMessage.of(subscriber, service.getMasterUser(), detection))
                 .forEach(mailClient::mail);
     }

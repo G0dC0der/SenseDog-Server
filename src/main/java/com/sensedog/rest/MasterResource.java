@@ -4,6 +4,7 @@ import com.sensedog.rest.entry.request.ConnectRequest;
 import com.sensedog.rest.entry.request.InviteRequest;
 import com.sensedog.rest.entry.request.MasterUserCreateRequest;
 import com.sensedog.rest.entry.response.TokenResponse;
+import com.sensedog.security.Token;
 import com.sensedog.service.UserService;
 
 import javax.inject.Inject;
@@ -19,12 +20,12 @@ import javax.ws.rs.core.Response;
 @Path("/master")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class MasterUserResource {
+public class MasterResource {
 
     private final UserService userService;
 
     @Inject
-    public MasterUserResource(final UserService userService) {
+    public MasterResource(final UserService userService) {
         this.userService = userService;
     }
 
@@ -55,7 +56,11 @@ public class MasterUserResource {
     @Path("invite")
     public Response invite(@HeaderParam("master-auth-token") String token,
                            @Valid InviteRequest request) {
-        userService.invite(token, request.getName(), request.getPhone(), request.getEmail());
+        userService.invite(
+                new Token.Master(token),
+                request.getName(),
+                request.getPhone(),
+                request.getEmail());
 
         return Response.noContent().build();
     }

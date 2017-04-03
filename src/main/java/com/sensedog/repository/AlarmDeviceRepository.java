@@ -6,9 +6,7 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import javax.inject.Inject;
-import java.io.Serializable;
 import java.time.ZonedDateTime;
-import java.util.Date;
 
 public class AlarmDeviceRepository {
 
@@ -17,6 +15,14 @@ public class AlarmDeviceRepository {
     @Inject
     public AlarmDeviceRepository(final SessionProvider provider) {
         this.provider = provider;
+    }
+
+    public void update(AlarmDevice alarmDevice) {
+        Session session = provider.provide();
+        session.getTransaction().begin();
+        session.update(alarmDevice);
+        session.getTransaction().commit();
+        session.close();
     }
 
     public void updateLastSeen(Integer id, ZonedDateTime date) {

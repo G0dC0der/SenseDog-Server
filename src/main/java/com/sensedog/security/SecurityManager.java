@@ -4,11 +4,12 @@ import com.sensedog.detection.DetectionType;
 import com.sensedog.detection.Severity;
 import com.sensedog.repository.DetectionRepository;
 import com.sensedog.repository.ServiceRepository;
+import com.sensedog.repository.entry.AlarmDevice;
 import com.sensedog.repository.entry.Detection;
-import com.sensedog.repository.entry.MasterUser;
 import com.sensedog.repository.entry.PinCode;
 import com.sensedog.repository.entry.Service;
 import com.sensedog.repository.entry.Subscriber;
+import com.sensedog.system.SystemStatus;
 
 import javax.inject.Inject;
 import java.time.Duration;
@@ -21,6 +22,8 @@ public class SecurityManager {
     public interface Settings {
         long getPinCodeLife();
     }
+
+    public static final int MINIMUM_NOTIFICATION_REGULARITY = 25000;
 
     private final Settings settings;
     private final DetectionRepository detectionRepository;
@@ -40,6 +43,11 @@ public class SecurityManager {
         return between.toMillis() > settings.getPinCodeLife();
     }
 
+    public boolean isLost(AlarmDevice alarmDevice) {
+        Duration between = Duration.between(alarmDevice.getLastSeen(), ZonedDateTime.now());
+        return between.toMinutes() > 30;
+    }
+
     public Severity determineSeverity(Service service, DetectionType newType) {
         if (newType == DetectionType.COMPASS) {
             return Severity.CRITICAL;
@@ -57,7 +65,7 @@ public class SecurityManager {
                 if (detectionDate.isAfter(halfMinuteAgo) && now.isAfter(detectionDate)) {
                     severity = Severity.WARNING;
                 }
-                if (aMinuteAgo.isBefore(detectionDate) && detectionDate.isBefore(halfMinuteAgo)) {
+                if (severity == Severity.WARNING && aMinuteAgo.isBefore(detectionDate) && detectionDate.isBefore(halfMinuteAgo)) {
                     severity = Severity.CRITICAL;
                     break;
                 }
@@ -71,18 +79,37 @@ public class SecurityManager {
         return diff.toMillis() > subscriber.getNotifyRegularity();
     }
 
-    public boolean mailCapable(Subscriber subscriber) {
+    public boolean hasCapability(Subscriber subscriber, Capability capability) {
         return subscriber.getSubscriberCapabilities()
                 .stream()
-                .anyMatch(subscriberCapability -> subscriberCapability.getCapability() == Capability.MAIL_READER);
+                .anyMatch(subscriberCapability -> subscriberCapability.getCapability() == capability);
     }
 
-    public Service authorize(String authToken) {
-        Service service = serviceRepository.getByAlarmDeviceToken(authToken);
+    public Service authenticate(Token.Alarm token) {
+        Service service = serviceRepository.getByAlarmDeviceToken(token.getToken());
 
         if (service == null) {
-            throw new UnauthorizedException("Invalid token.");
+            throw new AuthenticationFailedException("Invalid token.");
         }
+        stateControl(service);
+
         return service;
+    }
+
+    public Service authenticate(Token.Master token) {
+        Service service = serviceRepository.getByMasterToken(token.getToken());
+
+        if (service == null) {
+            throw new AuthenticationFailedException("Invalid token.");
+        }
+        stateControl(service);
+
+        return service;
+    }
+
+    private void stateControl(Service service) {
+        if (service.getStatus() != SystemStatus.ACTIVE) {
+            throw new StateViolationException("Can not connect to a service in a stopped state.");
+        }
     }
 }

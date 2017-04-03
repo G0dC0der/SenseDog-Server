@@ -46,14 +46,14 @@ public class Subscriber {
     private ZonedDateTime lastNotification;
 
     @Column(name = "notify_regularity")
-    private int notifyRegularity;
+    private Integer notifyRegularity;
 
     @Column(name = "minimum_severity")
     @Enumerated(EnumType.STRING)
     private Severity minimumSeverity;
 
-    @Column(name = "unsubscribe_key")
-    private String unsubscribeKey;
+    @Column(name = "security_key")
+    private String securityKey;
 
     @OneToMany(mappedBy = "subscriber", fetch = FetchType.EAGER)
     @Cascade(CascadeType.SAVE_UPDATE)
@@ -103,7 +103,7 @@ public class Subscriber {
         return notifyRegularity;
     }
 
-    public void setNotifyRegularity(int notifyRegularity) {
+    public void setNotifyRegularity(Integer notifyRegularity) {
         this.notifyRegularity = notifyRegularity;
     }
 
@@ -123,12 +123,12 @@ public class Subscriber {
         this.minimumSeverity = minimumSeverity;
     }
 
-    public String getUnsubscribeKey() {
-        return unsubscribeKey;
+    public String getSecurityKey() {
+        return securityKey;
     }
 
-    public void setUnsubscribeKey(String unsubscribeKey) {
-        this.unsubscribeKey = unsubscribeKey;
+    public void setSecurityKey(String securityKey) {
+        this.securityKey = securityKey;
     }
 
     public List<SubscriberCapability> getSubscriberCapabilities() {

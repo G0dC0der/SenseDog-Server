@@ -14,7 +14,8 @@ import com.sensedog.security.Capability;
 import com.sensedog.security.Cipher;
 import com.sensedog.security.CredentialException;
 import com.sensedog.security.SecurityManager;
-import com.sensedog.security.UnauthorizedException;
+import com.sensedog.security.Token;
+import com.sensedog.security.AuthenticationFailedException;
 import org.hibernate.exception.ConstraintViolationException;
 
 import javax.inject.Inject;
@@ -46,7 +47,6 @@ public class UserService {
                                  String phone,
                                  String email,
                                  String cloudToken) {
-
         MasterUser masterUser = new MasterUser();
         masterUser.setEmail(email);
         masterUser.setName(name);
@@ -70,15 +70,15 @@ public class UserService {
         PinCode pin = pinCodeRepository.getByPinCode(pinCode);
 
         if (pin == null) {
-            throw new UnauthorizedException("Invalid pin code.");
+            throw new AuthenticationFailedException("Invalid pin code.");
         }
         if (securityManager.hasExpired(pin)) {
-            throw new UnauthorizedException("Pin code has expired.");
+            throw new AuthenticationFailedException("Pin code has expired.");
         }
         Service service = pin.getService();
 
         if (service.getMasterUser() != null) {
-            throw new UnauthorizedException("A master user is already assigned for this service.");
+            throw new AuthenticationFailedException("A master user is already assigned for this service.");
         }
 
         service.setMasterUser(masterUser);
@@ -89,15 +89,11 @@ public class UserService {
         return service.getMasterAuthToken();
     }
 
-    public void invite(String token,
+    public void invite(Token.Master token,
                        String name,
                        String phone,
                        String email) {
-        Service service = serviceRepository.getByMasterToken(token);
-
-        if (service == null) {
-            throw new UnauthorizedException("Invalid token.");
-        }
+        Service service = securityManager.authenticate(token);
 
         for (Subscriber subscriber : service.getSubscribers()) {
             if (subscriber.getEmail().equals(email) || subscriber.getPhone().equals(phone)) {
@@ -110,8 +106,8 @@ public class UserService {
         subscriber.setPhone(phone);
         subscriber.setName(name);
         subscriber.setMinimumSeverity(Severity.SUSPICIOUS);
-        subscriber.setNotifyRegularity(1);
-        subscriber.setUnsubscribeKey(Cipher.authToken());
+        subscriber.setNotifyRegularity(SecurityManager.MINIMUM_NOTIFICATION_REGULARITY);
+        subscriber.setSecurityKey(Cipher.authToken());
         subscriber.setService(service);
 
         SubscriberCapability subscriberCapability1 = new SubscriberCapability();
