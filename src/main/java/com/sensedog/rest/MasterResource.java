@@ -5,6 +5,7 @@ import com.sensedog.rest.entry.request.InviteRequest;
 import com.sensedog.rest.entry.request.MasterUserCreateRequest;
 import com.sensedog.rest.entry.response.TokenResponse;
 import com.sensedog.security.Token;
+import com.sensedog.service.AlarmService;
 import com.sensedog.service.UserService;
 
 import javax.inject.Inject;
@@ -23,10 +24,13 @@ import javax.ws.rs.core.Response;
 public class MasterResource {
 
     private final UserService userService;
+    private final AlarmService alarmService;
 
     @Inject
-    public MasterResource(final UserService userService) {
+    public MasterResource(final UserService userService,
+                          final AlarmService alarmService) {
         this.userService = userService;
+        this.alarmService = alarmService;
     }
 
     @POST
@@ -54,10 +58,10 @@ public class MasterResource {
 
     @POST
     @Path("invite")
-    public Response invite(@HeaderParam("master-auth-token") String token,
+    public Response invite(@HeaderParam("master-auth-token") String authToken,
                            @Valid InviteRequest request) {
         userService.invite(
-                new Token.Master(token),
+                new Token.Master(authToken),
                 request.getName(),
                 request.getPhone(),
                 request.getEmail());
@@ -65,7 +69,17 @@ public class MasterResource {
         return Response.noContent().build();
     }
 
-    //TODO: Stop service. Tänk på att master user är admin
+    @POST
+    @Path("start")
+    public Response start(@HeaderParam("master-auth-token") String authToken) {
+        alarmService.start(new Token.Master(authToken));
+        return Response.noContent().build();
+    }
 
-    //Leave: En tjänst som disconnectar sig som master till en tjänst. Frågan är, genererar man en ny PIN-kod? Då kan man lika gärna stoppa den manuellt från OP
+    @POST
+    @Path("stop")
+    public Response stop(@HeaderParam("master-auth-token") String authToken) {
+        alarmService.stop(new Token.Master(authToken));
+        return Response.noContent().build();
+    }
 }

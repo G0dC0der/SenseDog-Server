@@ -77,6 +77,8 @@ public class UserService {
         }
         Service service = pin.getService();
 
+        securityManager.stateVerify(service);
+
         if (service.getMasterUser() != null) {
             throw new AuthenticationFailedException("A master user is already assigned for this service.");
         }

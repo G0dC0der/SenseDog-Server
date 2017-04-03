@@ -91,10 +91,10 @@ public class AlarmService {
                        DetectionType detectionType,
                        String value) {
         Service service = securityManager.authenticate(token);
-        service.setStatus(SystemStatus.ACTIVE); //TODO: Denna sparas ej
+        securityManager.stateVerify(service);
 
         if (service.getMasterUser() == null) {
-            throw new BadRequestException("Can not broadcast a detection master user absence.");
+            throw new BadRequestException("Can not broadcast a detection with master user absence.");
         }
 
         Severity severity = securityManager.determineSeverity(service, detectionType);
@@ -113,10 +113,13 @@ public class AlarmService {
                 .getSubscribers()
                 .stream()
                 .filter(subscriber -> subscriber.getMinimumSeverity().isAboveOrEqual(severity))
-                .filter(securityManager::receiveCapable)
+                .filter(subscriber -> securityManager.receiveCapable(subscriber, detection))
                 .collect(Collectors.toList());
 
-        mailTo(service, detection, warningReceivers);
+        warningReceivers.stream()
+                .filter(subscriber -> securityManager.hasCapability(subscriber, Capability.MAIL_READER))
+                .map(subscriber -> DetectionMessage.of(subscriber, service.getMasterUser(), detection))
+                .forEach(mailClient::mail);
 
         if (severity.isAboveOrEqual(Severity.WARNING)) {
             //Send text
@@ -126,21 +129,20 @@ public class AlarmService {
             //Call text
         }
 
+        //Always push to master user
+
         subscriberRepository.updateLastNotifications(warningReceivers, detection.getDetectionDate());
     }
 
-    private void mailTo(Service service, Detection detection, List<Subscriber> receivers) {
-        receivers.stream()
-                .filter(subscriber -> securityManager.hasCapability(subscriber, Capability.MAIL_READER))
-                .map(subscriber -> DetectionMessage.of(subscriber, service.getMasterUser(), detection))
-                .forEach(mailClient::mail);
+    public void start(Token token) {
+        Service  service = securityManager.authenticate(token);
+        service.setStatus(SystemStatus.ACTIVE);
+        serviceRepository.update(service);
     }
 
-    private void textTo() {
-
-    }
-
-    private void callTo() {
-
+    public void stop(Token token) {
+        Service  service = securityManager.authenticate(token);
+        service.setStatus(SystemStatus.STOPPED);
+        serviceRepository.update(service);
     }
 }

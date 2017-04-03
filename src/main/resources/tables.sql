@@ -48,15 +48,17 @@ CREATE TABLE detection (
 );
 
 CREATE TABLE subscriber (
-    subscriber_id       INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    service_id          INT,
-    name                VARCHAR(255),
-    phone               VARCHAR(255) NOT NULL,
-    email               VARCHAR(255),
-    notify_regularity   INT,
-    last_notification   TIMESTAMP,
-    minimum_severity    VARCHAR(255),
-    security_key     VARCHAR(255) NOT NULL
+    subscriber_id              INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    service_id                 INT,
+    name                       VARCHAR(255),
+    phone                      VARCHAR(255) NOT NULL,
+    email                      VARCHAR(255),
+    notify_regularity          INT,
+    last_notification_date     TIMESTAMP,
+    last_notification_type     VARCHAR(255),
+    last_notification_severity VARCHAR(255),
+    minimum_severity           VARCHAR(255),
+    security_key               VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE subscriber_capability (

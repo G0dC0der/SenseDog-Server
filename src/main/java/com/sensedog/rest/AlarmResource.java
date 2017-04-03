@@ -51,4 +51,18 @@ public class AlarmResource {
         alarmService.detect(new Token.Alarm(authToken), request.getDetectionType(), request.getValue());
         return Response.noContent().build();
     }
+
+    @POST
+    @Path("stop")
+    public Response stop(@HeaderParam("alarm-auth-token") String authToken) {
+        alarmService.stop(new Token.Alarm(authToken));
+        return Response.noContent().build();
+    }
+
+    @POST
+    @Path("start")
+    public Response start(@HeaderParam("alarm-auth-token") String authToken) {
+        alarmService.start(new Token.Alarm(authToken));
+        return Response.noContent().build();
+    }
 }

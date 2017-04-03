@@ -1,5 +1,6 @@
 package com.sensedog.repository.entry;
 
+import com.sensedog.detection.DetectionType;
 import com.sensedog.detection.Severity;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -42,8 +43,14 @@ public class Subscriber {
     @Column
     private String email;
 
-    @Column(name = "last_notification")
-    private ZonedDateTime lastNotification;
+    @Column(name = "last_notification_date")
+    private ZonedDateTime lastNotificationDate;
+
+    @Column(name = "last_notification_type")
+    private DetectionType lastDetectionType;
+
+    @Column(name = "last_notification_severity")
+    private Severity lastSeverity;
 
     @Column(name = "notify_regularity")
     private Integer notifyRegularity;
@@ -107,12 +114,28 @@ public class Subscriber {
         this.notifyRegularity = notifyRegularity;
     }
 
-    public ZonedDateTime getLastNotification() {
-        return lastNotification;
+    public ZonedDateTime getLastNotificationDate() {
+        return lastNotificationDate;
     }
 
-    public void setLastNotification(ZonedDateTime lastNotification) {
-        this.lastNotification = lastNotification;
+    public void setLastNotificationDate(ZonedDateTime lastNotificationDate) {
+        this.lastNotificationDate = lastNotificationDate;
+    }
+
+    public DetectionType getLastDetectionType() {
+        return lastDetectionType;
+    }
+
+    public void setLastDetectionType(DetectionType lastDetectionType) {
+        this.lastDetectionType = lastDetectionType;
+    }
+
+    public Severity getLastSeverity() {
+        return lastSeverity;
+    }
+
+    public void setLastSeverity(Severity lastSeverity) {
+        this.lastSeverity = lastSeverity;
     }
 
     public Severity getMinimumSeverity() {

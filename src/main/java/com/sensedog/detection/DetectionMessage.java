@@ -2,17 +2,16 @@ package com.sensedog.detection;
 
 import com.sensedog.repository.entry.Detection;
 import com.sensedog.repository.entry.MasterUser;
-import com.sensedog.repository.entry.Service;
 import com.sensedog.repository.entry.Subscriber;
 import com.sensedog.transmit.MailMessage;
 
 public class DetectionMessage implements MailMessage {
 
+    private String receiver;
     private String subject;
     private String message;
-    private String receiver;
 
-    private DetectionMessage(String subject, String message, String receiver) {
+    private DetectionMessage(String receiver, String subject, String message) {
         this.subject = subject;
         this.message = message;
         this.receiver = receiver;
@@ -33,10 +32,15 @@ public class DetectionMessage implements MailMessage {
         return message;
     }
 
-    public static MailMessage of(Subscriber subscriber, MasterUser admin, Detection... detections) {
+    public static MailMessage of(Subscriber subscriber, MasterUser master, Detection detection) {
         final String receiver = subscriber.getEmail();
-//        final String subject = String.format("[%s] SenseDog Detection - %s", detection.getSeverity(), )
+        final String subject = String.format("[%s] SenseDog Detection - %s", detection.getSeverity(), master.getName());
+        final String message = String.format("Hi %s!\nSenseDog service %s have detected malicious movement with severity %s in sensor %s.",
+                subscriber.getName(),
+                master.getName(),
+                detection.getSeverity(),
+                detection.getDetectionType());
 
-        return null;
+        return new DetectionMessage(receiver, subject, message);
     }
 }

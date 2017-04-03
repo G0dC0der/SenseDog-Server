@@ -74,8 +74,15 @@ public class SecurityManager {
         return severity;
     }
 
-    public boolean receiveCapable(Subscriber subscriber) {
-        Duration diff = Duration.between(subscriber.getLastNotification(), ZonedDateTime.now());
+    public boolean receiveCapable(Subscriber subscriber, Detection detection) {
+        if (detection.getDetectionType() != subscriber.getLastDetectionType()) {
+            return true;
+        }
+        if (detection.getSeverity().isAbove(subscriber.getMinimumSeverity())) {
+            return true;
+        }
+
+        Duration diff = Duration.between(subscriber.getLastNotificationDate(), ZonedDateTime.now());
         return diff.toMillis() > subscriber.getNotifyRegularity();
     }
 
@@ -85,29 +92,24 @@ public class SecurityManager {
                 .anyMatch(subscriberCapability -> subscriberCapability.getCapability() == capability);
     }
 
-    public Service authenticate(Token.Alarm token) {
-        Service service = serviceRepository.getByAlarmDeviceToken(token.getToken());
+    public Service authenticate(Token token) {
+        Service service;
+        if (token instanceof Token.Alarm) {
+            service = serviceRepository.getByAlarmDeviceToken(token.getToken());
+        } else if (token instanceof  Token.Master) {
+            service = serviceRepository.getByMasterToken(token.getToken());
+        } else {
+            throw new RuntimeException("Unknown token: " + token.getClass());
+        }
 
         if (service == null) {
             throw new AuthenticationFailedException("Invalid token.");
         }
-        stateControl(service);
 
         return service;
     }
 
-    public Service authenticate(Token.Master token) {
-        Service service = serviceRepository.getByMasterToken(token.getToken());
-
-        if (service == null) {
-            throw new AuthenticationFailedException("Invalid token.");
-        }
-        stateControl(service);
-
-        return service;
-    }
-
-    private void stateControl(Service service) {
+    public void stateVerify(Service service) {
         if (service.getStatus() != SystemStatus.ACTIVE) {
             throw new StateViolationException("Can not connect to a service in a stopped state.");
         }
