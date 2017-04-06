@@ -87,7 +87,7 @@ public class AlarmService {
         return alarmDevice.getAuthToken();
     }
 
-    public void detect(Token.Alarm token,
+    public Severity detect(Token.Alarm token,
                        DetectionType detectionType,
                        String value) {
         Service service = securityManager.authenticate(token);
@@ -132,6 +132,8 @@ public class AlarmService {
         //Always push to master user
 
         subscriberRepository.updateLastNotifications(warningReceivers, detection.getDetectionDate());
+
+        return severity;
     }
 
     public void start(Token token) {
