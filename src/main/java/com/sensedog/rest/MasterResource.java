@@ -24,13 +24,10 @@ import javax.ws.rs.core.Response;
 public class MasterResource {
 
     private final UserService userService;
-    private final AlarmService alarmService;
 
     @Inject
-    public MasterResource(final UserService userService,
-                          final AlarmService alarmService) {
+    public MasterResource(final UserService userService) {
         this.userService = userService;
-        this.alarmService = alarmService;
     }
 
     @POST
@@ -72,14 +69,14 @@ public class MasterResource {
     @POST
     @Path("start")
     public Response start(@HeaderParam("master-auth-token") String authToken) {
-        alarmService.start(new Token.Master(authToken));
+        userService.start(new Token.Master(authToken));
         return Response.noContent().build();
     }
 
     @POST
     @Path("stop")
     public Response stop(@HeaderParam("master-auth-token") String authToken) {
-        alarmService.stop(new Token.Master(authToken));
+        userService.stop(new Token.Master(authToken));
         return Response.noContent().build();
     }
 }

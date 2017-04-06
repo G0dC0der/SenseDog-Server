@@ -16,6 +16,7 @@ import com.sensedog.security.CredentialException;
 import com.sensedog.security.SecurityManager;
 import com.sensedog.security.Token;
 import com.sensedog.security.AuthenticationFailedException;
+import com.sensedog.system.SystemStatus;
 import org.hibernate.exception.ConstraintViolationException;
 
 import javax.inject.Inject;
@@ -123,5 +124,17 @@ public class UserService {
         subscriber.setSubscriberCapabilities(Arrays.asList(subscriberCapability1, subscriberCapability2));
 
         subscriberRepository.save(subscriber);
+    }
+
+    public void start(Token token) {
+        Service service = securityManager.authenticate(token);
+        service.setStatus(SystemStatus.ACTIVE);
+        serviceRepository.update(service);
+    }
+
+    public void stop(Token token) {
+        Service  service = securityManager.authenticate(token);
+        service.setStatus(SystemStatus.STOPPED);
+        serviceRepository.update(service);
     }
 }

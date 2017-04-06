@@ -139,12 +139,20 @@ public class AlarmService {
     public void start(Token token) {
         Service  service = securityManager.authenticate(token);
         service.setStatus(SystemStatus.ACTIVE);
+        PinCode pinCode = new PinCode();
+        pinCode.setCreationDate(ZonedDateTime.now());
+        pinCode.setPinCode(Cipher.pinCode());
+        pinCode.setService(service);
+        service.setPinCode(pinCode);
         serviceRepository.update(service);
     }
 
     public void stop(Token token) {
         Service  service = securityManager.authenticate(token);
         service.setStatus(SystemStatus.STOPPED);
+        service.setMasterAuthToken(null);
+        service.setMasterUser(null);
+        service.setPinCode(null);
         serviceRepository.update(service);
     }
 }
