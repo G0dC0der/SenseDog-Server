@@ -39,11 +39,21 @@ public class StatusResource {
     @GET
     @Path("read")
     public Response read(@HeaderParam("master-auth-token") String masterAuthToken) {
-        HealthStatus healthStatus = statusService.read(masterAuthToken);
+        HealthStatus healthStatus = statusService.read(new Token.Master(masterAuthToken));
 
         HealthResponse response = new HealthResponse();
         response.setBattery(healthStatus.getBattery());
         response.setLastSeen(healthStatus.getLastSeen());
+        response.setSystemStatus(healthStatus.getSystemStatus());
+
+        return Response.ok(response).build();
+    }
+
+    @GET
+    public Response readStatus(@HeaderParam("alarm-auth-token") String alarmAuthToken) {
+        HealthStatus healthStatus = statusService.read(new Token.Alarm(alarmAuthToken));
+
+        HealthResponse response = new HealthResponse();
         response.setSystemStatus(healthStatus.getSystemStatus());
 
         return Response.ok(response).build();

@@ -18,7 +18,7 @@ public class PinCodeRepository {
 
     public PinCode getByPinCode(String pinCode) {
         Session session = provider.provide();
-        Query query = session.createQuery("FROM PinCode AS p WHERE p.pinCode = :pinCode");
+        Query query = session.createQuery("FROM ServiceInfo AS p WHERE p.pinCode = :pinCode");
         query.setParameter("pinCode", pinCode);
         Object result = query.getResultList().isEmpty() ? null : query.getSingleResult();
         session.close();

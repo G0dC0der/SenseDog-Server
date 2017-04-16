@@ -67,7 +67,7 @@ public class MasterResource {
     }
 
     @POST
-    @Path("start")
+    @Path("resume")
     public Response start(@HeaderParam("master-auth-token") String authToken) {
         userService.start(new Token.Master(authToken));
         return Response.noContent().build();

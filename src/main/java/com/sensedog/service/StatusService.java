@@ -34,8 +34,8 @@ public class StatusService {
         serviceRepository.update(service);
     }
 
-    public HealthStatus read(String masterAuthToken) {
-        Service service = securityManager.authenticate(new Token.Master(masterAuthToken));
+    public HealthStatus read(Token token) {
+        Service service = securityManager.authenticate(token);
         AlarmDevice alarmDevice = service.getAlarmDevice();
 
         if (service.getStatus().isActive() && securityManager.isLost(alarmDevice)) {

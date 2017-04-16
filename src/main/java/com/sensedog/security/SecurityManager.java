@@ -6,6 +6,7 @@ import com.sensedog.repository.DetectionRepository;
 import com.sensedog.repository.ServiceRepository;
 import com.sensedog.repository.entry.AlarmDevice;
 import com.sensedog.repository.entry.Detection;
+import com.sensedog.repository.entry.MasterUser;
 import com.sensedog.repository.entry.PinCode;
 import com.sensedog.repository.entry.Service;
 import com.sensedog.repository.entry.Subscriber;
@@ -107,6 +108,13 @@ public class SecurityManager {
         }
 
         return service;
+    }
+
+    public MasterUser requireMaster(Service service) {
+        if (service.getMasterUser() == null) {
+            throw new StateViolationException("No master connected yet.");
+        }
+        return service.getMasterUser();
     }
 
     public void stateVerify(Service service) {

@@ -16,12 +16,12 @@ import com.sensedog.security.Capability;
 import com.sensedog.security.Cipher;
 import com.sensedog.security.SecurityManager;
 import com.sensedog.security.Token;
+import com.sensedog.service.domain.ServiceInfo;
 import com.sensedog.system.SystemStatus;
 import com.sensedog.transmit.CloudClient;
 import com.sensedog.transmit.MailClient;
 
 import javax.inject.Inject;
-import javax.ws.rs.BadRequestException;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,16 +53,16 @@ public class AlarmService {
         this.cloudClient = cloudClient;
     }
 
-    public String create(String cloudToken,
-                         String deviceModel,
-                         String osVersion,
-                         String appVersion,
-                         String carrier,
-                         Float battery) {
+    public ServiceInfo create(String cloudToken,
+                              String deviceModel,
+                              String osVersion,
+                              String appVersion,
+                              String carrier,
+                              Float battery) {
 
         Service service = new Service();
         service.setCreationDate(ZonedDateTime.now());
-        service.setStatus(SystemStatus.ACTIVE);
+        service.setStatus(SystemStatus.STOPPED);
 
         PinCode pinCode = new PinCode();
         pinCode.setPinCode(Cipher.pinCode());
@@ -84,7 +84,11 @@ public class AlarmService {
 
         serviceRepository.create(service);
 
-        return alarmDevice.getAuthToken();
+        ServiceInfo serviceInfo = new ServiceInfo();
+        serviceInfo.setPinCode(pinCode.getPinCode());
+        serviceInfo.setAlarmAuthToken(alarmDevice.getAuthToken());
+
+        return serviceInfo;
     }
 
     public Severity detect(Token.Alarm token,
@@ -92,10 +96,7 @@ public class AlarmService {
                        String value) {
         Service service = securityManager.authenticate(token);
         securityManager.stateVerify(service);
-
-        if (service.getMasterUser() == null) {
-            throw new BadRequestException("Can not broadcast a detection with master user absence.");
-        }
+        securityManager.requireMaster(service);
 
         Severity severity = securityManager.determineSeverity(service, detectionType);
 
@@ -136,9 +137,9 @@ public class AlarmService {
         return severity;
     }
 
-    public void start(Token token) {
+    public void resume(Token token) {
         Service  service = securityManager.authenticate(token);
-        service.setStatus(SystemStatus.ACTIVE);
+        service.setStatus(SystemStatus.STOPPED);
         PinCode pinCode = new PinCode();
         pinCode.setCreationDate(ZonedDateTime.now());
         pinCode.setPinCode(Cipher.pinCode());

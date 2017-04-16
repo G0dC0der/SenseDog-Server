@@ -84,6 +84,7 @@ public class UserService {
             throw new AuthenticationFailedException("A master user is already assigned for this service.");
         }
 
+        service.setStatus(SystemStatus.ACTIVE);
         service.setMasterUser(masterUser);
         service.setMasterAuthToken(Cipher.authToken());
 
