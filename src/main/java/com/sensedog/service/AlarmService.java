@@ -137,23 +137,15 @@ public class AlarmService {
         return severity;
     }
 
-    public void resume(Token token) {
-        Service  service = securityManager.authenticate(token);
-        service.setStatus(SystemStatus.STOPPED);
-        PinCode pinCode = new PinCode();
-        pinCode.setCreationDate(ZonedDateTime.now());
-        pinCode.setPinCode(Cipher.pinCode());
-        pinCode.setService(service);
-        service.setPinCode(pinCode);
+    public void start(Token token) {
+        Service service = securityManager.authenticate(token);
+        service.setStatus(service.getMasterUser() != null ? SystemStatus.ACTIVE : SystemStatus.STOPPED);
         serviceRepository.update(service);
     }
 
     public void stop(Token token) {
         Service  service = securityManager.authenticate(token);
         service.setStatus(SystemStatus.STOPPED);
-        service.setMasterAuthToken(null);
-        service.setMasterUser(null);
-        service.setPinCode(null);
         serviceRepository.update(service);
     }
 }

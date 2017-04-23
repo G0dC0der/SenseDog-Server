@@ -1,11 +1,11 @@
 package com.sensedog.rest;
 
+import com.sensedog.rest.entry.request.CloudUpdateRequest;
 import com.sensedog.rest.entry.request.ConnectRequest;
 import com.sensedog.rest.entry.request.InviteRequest;
 import com.sensedog.rest.entry.request.MasterUserCreateRequest;
 import com.sensedog.rest.entry.response.TokenResponse;
 import com.sensedog.security.Token;
-import com.sensedog.service.AlarmService;
 import com.sensedog.service.UserService;
 
 import javax.inject.Inject;
@@ -13,6 +13,7 @@ import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -68,15 +69,22 @@ public class MasterResource {
 
     @POST
     @Path("resume")
-    public Response start(@HeaderParam("master-auth-token") String authToken) {
-        userService.start(new Token.Master(authToken));
+    public Response resume(@HeaderParam("master-auth-token") String authToken) {
+        userService.resume(new Token.Master(authToken));
         return Response.noContent().build();
     }
 
     @POST
-    @Path("stop")
-    public Response stop(@HeaderParam("master-auth-token") String authToken) {
-        userService.stop(new Token.Master(authToken));
+    @Path("pause")
+    public Response pause(@HeaderParam("master-auth-token") String authToken) {
+        userService.pause(new Token.Master(authToken));
+        return Response.noContent().build();
+    }
+
+    @PUT
+    @Path("update/cloud")
+    public Response updateCloud(@HeaderParam("master-auth-token") String authToken, CloudUpdateRequest request) {
+        userService.updateMasterCloudToken(new Token.Master(authToken), request.getCloudToken());
         return Response.noContent().build();
     }
 }

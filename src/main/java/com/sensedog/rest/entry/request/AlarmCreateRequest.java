@@ -14,7 +14,7 @@ public class AlarmCreateRequest {
     private String osVersion;
     @NotBlank
     private String appVersion;
-    @NotBlank
+    @NotNull
     private String carrier;
     @NotNull
     private Float battery;

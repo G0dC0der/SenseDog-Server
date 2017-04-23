@@ -2,21 +2,22 @@ package com.sensedog.rest;
 
 import com.sensedog.detection.Severity;
 import com.sensedog.rest.entry.request.AlarmCreateRequest;
+import com.sensedog.rest.entry.request.CloudUpdateRequest;
 import com.sensedog.rest.entry.request.DetectRequest;
 import com.sensedog.rest.entry.response.ServiceCreateResponse;
 import com.sensedog.rest.entry.response.SeverityResponse;
-import com.sensedog.rest.entry.response.TokenResponse;
 import com.sensedog.security.Token;
 import com.sensedog.service.AlarmService;
+import com.sensedog.service.UserService;
 import com.sensedog.service.domain.ServiceInfo;
 import org.apache.http.auth.AuthenticationException;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -28,10 +29,13 @@ import javax.ws.rs.core.Response;
 public class AlarmResource {
 
     private final AlarmService alarmService;
+    private final UserService userService;
 
     @Inject
-    public AlarmResource(AlarmService alarmService) {
+    public AlarmResource(final AlarmService alarmService,
+                         final UserService userService) {
         this.alarmService = alarmService;
+        this.userService = userService;
     }
 
     @POST
@@ -71,13 +75,31 @@ public class AlarmResource {
     @Path("stop")
     public Response stop(@HeaderParam("alarm-auth-token") String authToken) {
         alarmService.stop(new Token.Alarm(authToken));
+
         return Response.noContent().build();
     }
 
     @POST
-    @Path("resume")
-    public Response resume(@HeaderParam("alarm-auth-token") String authToken) {
-        alarmService.resume(new Token.Alarm(authToken));
+    @Path("start")
+    public Response start(@HeaderParam("alarm-auth-token") String authToken) {
+        alarmService.start(new Token.Alarm(authToken));
+
+        return Response.noContent().build();
+    }
+
+    @POST
+    @Path("destroy")
+    public Response destroy(@HeaderParam("alarm-auth-token") String authToken) {
+        //TODO: Removes the entire service.
+        //Client should also remove their auth token when this endpoint is called.
+        return null;
+    }
+
+    @PUT
+    @Path("update/cloud")
+    public Response updateCloud(@HeaderParam("alarm-auth-token") String authToken, CloudUpdateRequest request) {
+        userService.updateAlarmCloudToken(new Token.Alarm(authToken), request.getCloudToken());
+
         return Response.noContent().build();
     }
 }

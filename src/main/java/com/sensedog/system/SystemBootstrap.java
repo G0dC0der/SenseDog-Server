@@ -9,6 +9,7 @@ import com.sensedog.repository.SubscriberRepository;
 import com.sensedog.rest.AlarmResource;
 import com.sensedog.rest.MasterResource;
 import com.sensedog.rest.StatusResource;
+import com.sensedog.rest.TestResource;
 import com.sensedog.security.SecurityManager;
 import com.sensedog.service.AlarmService;
 import com.sensedog.service.StatusService;
@@ -35,11 +36,12 @@ class SystemBootstrap extends ResourceConfig {
         register(MasterResource.class);
         register(StatusResource.class);
         register(JacksonFeature.class);
+        register(TestResource.class);
 
         final SessionFactory sessionFactory = (SessionFactory) Persistence.createEntityManagerFactory("sensedog-engine");
         final SessionProvider sessionProvider = sessionFactory::openSession;
         final Properties props = PropertyUtil.readProperties("settings.properties");
-        final CloudClient cloudClient = new CloudClient(props.getProperty("cloud.key"),  Integer.parseInt(props.getProperty("cloud.retries")));
+        final CloudClient cloudClient = new CloudClient(props.getProperty("cloud.key"));
         final TransmitClient transmitClient = new TransmitClient(props.getProperty("twilio.sender"), props.getProperty("twilio.account.token"), props.getProperty("twilio.auth.token"));
         final MailClient messenger = new MailClient(props.getProperty("sendgrid.sender"), props.getProperty("sendgrid.key"));
         final SecurityManager.Settings settings = ()-> Long.parseLong(props.getProperty("security.pincode.life"));

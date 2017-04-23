@@ -47,9 +47,11 @@ public class Subscriber {
     private ZonedDateTime lastNotificationDate;
 
     @Column(name = "last_notification_type")
+    @Enumerated(EnumType.STRING)
     private DetectionType lastDetectionType;
 
     @Column(name = "last_notification_severity")
+    @Enumerated(EnumType.STRING)
     private Severity lastSeverity;
 
     @Column(name = "notify_regularity")

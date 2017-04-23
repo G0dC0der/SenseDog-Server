@@ -1,37 +1,32 @@
 package com.sensedog.transmit;
 
-import com.google.android.gcm.server.Message;
-import com.google.android.gcm.server.Sender;
+import com.sun.xml.internal.ws.client.SenderException;
 
-import java.io.IOException;
-import java.util.Map.Entry;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 public class CloudClient {
 
-    private final Sender sender;
-    private final int retries;
+    private final String apiKey;
+    private final Client client;
 
-    public CloudClient(String apiKey, int retries) {
-        this.sender = new Sender(apiKey);
-        this.retries = retries;
+    public CloudClient(String apiKey) {
+        this.apiKey = apiKey;
+        this.client = ClientBuilder.newClient();
     }
 
-    public void send(CloudMessage<?> message) { //TODO: Error handling
-        try {
-            Message sendData = prepareMessage(message);
-            sender.send(sendData, message.getReceivers(), retries);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void send(CloudMessage<?> message) {
+        Response response = client.target("https://fcm.googleapis.com/fcm/send")
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .header("Authorization", "key=" + apiKey)
+                .header("Content-Type", "application/json")
+                .post(Entity.json(message.getJson()));
+
+        if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
+            throw new SenderException("Could not notification.");
         }
-    }
-
-    private Message prepareMessage(CloudMessage<?> message) {
-        Message.Builder builder = new Message.Builder();
-
-        for(Entry<String, String> entry : message.getData().entrySet())  {
-            builder.addData(entry.getKey(), entry.getValue());
-        }
-
-        return builder.build();
     }
 }

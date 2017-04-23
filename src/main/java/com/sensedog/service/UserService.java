@@ -127,15 +127,29 @@ public class UserService {
         subscriberRepository.save(subscriber);
     }
 
-    public void start(Token token) {
+    public void resume(Token token) {
         Service service = securityManager.authenticate(token);
         service.setStatus(SystemStatus.ACTIVE);
         serviceRepository.update(service);
     }
 
-    public void stop(Token token) {
+    public void pause(Token token) {
         Service  service = securityManager.authenticate(token);
         service.setStatus(SystemStatus.STOPPED);
+        serviceRepository.update(service);
+    }
+
+    public void updateAlarmCloudToken(Token.Alarm token, String cloudToken) {
+        Service service = securityManager.authenticate(token);
+
+        service.getAlarmDevice().setCloudToken(cloudToken);
+        serviceRepository.update(service);
+    }
+
+    public void updateMasterCloudToken(Token.Master token, String cloudToken) {
+        Service service = securityManager.authenticate(token);
+
+        service.getMasterUser().setCloudToken(cloudToken);
         serviceRepository.update(service);
     }
 }
