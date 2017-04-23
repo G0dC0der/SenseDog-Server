@@ -36,7 +36,6 @@ class SystemBootstrap extends ResourceConfig {
         register(MasterResource.class);
         register(StatusResource.class);
         register(JacksonFeature.class);
-        register(TestResource.class);
 
         final SessionFactory sessionFactory = (SessionFactory) Persistence.createEntityManagerFactory("sensedog-engine");
         final SessionProvider sessionProvider = sessionFactory::openSession;
