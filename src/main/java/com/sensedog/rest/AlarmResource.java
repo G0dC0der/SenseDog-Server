@@ -47,6 +47,7 @@ public class AlarmResource {
                 request.getOsVersion(),
                 request.getAppVersion(),
                 request.getCarrier(),
+                request.getServiceName(),
                 request.getBattery());
 
         ServiceCreateResponse response = new ServiceCreateResponse();

@@ -44,6 +44,9 @@ public class Service {
     @Enumerated(EnumType.STRING)
     private SystemStatus status;
 
+    @Column(name = "service_name")
+    private String serviceName;
+
     @OneToOne(mappedBy = "service")
     @Cascade(CascadeType.SAVE_UPDATE)
     private PinCode pinCode;
@@ -127,5 +130,13 @@ public class Service {
 
     public void setSubscribers(List<Subscriber> subscribers) {
         this.subscribers = subscribers;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 }

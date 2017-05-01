@@ -9,7 +9,6 @@ import com.sensedog.repository.SubscriberRepository;
 import com.sensedog.rest.AlarmResource;
 import com.sensedog.rest.MasterResource;
 import com.sensedog.rest.StatusResource;
-import com.sensedog.rest.TestResource;
 import com.sensedog.security.SecurityManager;
 import com.sensedog.service.AlarmService;
 import com.sensedog.service.StatusService;

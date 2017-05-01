@@ -58,11 +58,13 @@ public class AlarmService {
                               String osVersion,
                               String appVersion,
                               String carrier,
+                              String serviceName,
                               Float battery) {
 
         Service service = new Service();
         service.setCreationDate(ZonedDateTime.now());
         service.setStatus(SystemStatus.STOPPED);
+        service.setServiceName(serviceName);
 
         PinCode pinCode = new PinCode();
         pinCode.setPinCode(Cipher.pinCode());

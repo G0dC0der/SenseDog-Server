@@ -15,9 +15,10 @@ public class AlarmCreateRequest {
     @NotBlank
     private String appVersion;
     @NotNull
-    private String carrier;
-    @NotNull
     private Float battery;
+    @NotBlank
+    private String serviceName;
+    private String carrier;
 
     public String getCloudToken() {
         return cloudToken;
@@ -65,5 +66,13 @@ public class AlarmCreateRequest {
 
     public void setBattery(Float battery) {
         this.battery = battery;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 }

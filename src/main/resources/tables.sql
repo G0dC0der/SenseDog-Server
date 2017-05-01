@@ -6,6 +6,7 @@ CREATE TABLE service (
     service_id              INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     master_user_id          INT,
     master_user_auth_token  VARCHAR(255),
+    service_name            VARCHAR(255) NOT NULL,
     status                  VARCHAR(255) NOT NULL,
     creation_date           TIMESTAMP NOT NULL
 );

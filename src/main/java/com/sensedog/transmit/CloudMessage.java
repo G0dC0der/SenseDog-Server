@@ -15,7 +15,7 @@ public class CloudMessage<T> {
     }
 
     String getJson() {
-        return Mapper.stringify(new SerializedMessage(Mapper.toMap(this.data), to));
+        return Mapper.stringify(new SerializedMessage(Mapper.toMap(data), to));
     }
 
     public static <T> CloudMessage<T> from(T data, String to) {
