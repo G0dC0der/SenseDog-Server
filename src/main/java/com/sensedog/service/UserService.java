@@ -5,6 +5,7 @@ import com.sensedog.repository.MasterUserRepository;
 import com.sensedog.repository.PinCodeRepository;
 import com.sensedog.repository.ServiceRepository;
 import com.sensedog.repository.SubscriberRepository;
+import com.sensedog.repository.entry.Detection;
 import com.sensedog.repository.entry.MasterUser;
 import com.sensedog.repository.entry.PinCode;
 import com.sensedog.repository.entry.Service;
@@ -16,12 +17,18 @@ import com.sensedog.security.CredentialException;
 import com.sensedog.security.SecurityManager;
 import com.sensedog.security.Token;
 import com.sensedog.security.AuthenticationFailedException;
+import com.sensedog.service.domain.ServiceInfo;
+import com.sensedog.service.domain.SubscriberInfo;
 import com.sensedog.system.SystemStatus;
 import org.hibernate.exception.ConstraintViolationException;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UserService {
 
@@ -78,8 +85,6 @@ public class UserService {
         }
         Service service = pin.getService();
 
-        securityManager.stateVerify(service);
-
         if (service.getMasterUser() != null) {
             throw new AuthenticationFailedException("A master user is already assigned for this service.");
         }
@@ -125,6 +130,14 @@ public class UserService {
         subscriber.setSubscriberCapabilities(Arrays.asList(subscriberCapability1, subscriberCapability2));
 
         subscriberRepository.save(subscriber);
+    }
+
+    public List<ServiceInfo> viewAll(String email) {
+        Service[] services = serviceRepository.findServicesByMasterEmail(email);
+
+        return Stream.of(services)
+                .map(ServiceInfo::from)
+                .collect(Collectors.toList());
     }
 
     public void resume(Token token) {

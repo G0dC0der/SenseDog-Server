@@ -30,12 +30,14 @@ public class SubscriberRepository {
         return (Integer) id;
     }
 
-    public void updateLastNotifications(List<Subscriber> subscribers, ZonedDateTime lastNotification) {
+    public void updateLastNotifications(List<Subscriber> subscribers, ZonedDateTime lastNotificationDate) {
         Session session = provider.provide();
-        Query query = session.createQuery("UPDATE Subscriber AS s SET s.lastNotification = :lastNotification WHERE s.id IN (:ids)");
-        query.setParameter("lastNotification", lastNotification);
+        session.getTransaction().begin();
+        Query query = session.createQuery("UPDATE Subscriber AS s SET s.lastNotificationDate = :lastNotificationDate WHERE s.id IN (:ids)");
+        query.setParameter("lastNotificationDate", lastNotificationDate);
         query.setParameterList("ids", subscribers.stream().map(Subscriber::getId).collect(Collectors.toList()));
         query.executeUpdate();
+        session.getTransaction().commit();
         session.close();
     }
 }

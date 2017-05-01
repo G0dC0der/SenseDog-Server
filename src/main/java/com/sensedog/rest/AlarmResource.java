@@ -9,7 +9,7 @@ import com.sensedog.rest.entry.response.SeverityResponse;
 import com.sensedog.security.Token;
 import com.sensedog.service.AlarmService;
 import com.sensedog.service.UserService;
-import com.sensedog.service.domain.ServiceInfo;
+import com.sensedog.service.domain.AlarmServiceInfo;
 import org.apache.http.auth.AuthenticationException;
 
 import javax.inject.Inject;
@@ -41,7 +41,7 @@ public class AlarmResource {
     @POST
     @Path("create")
     public Response create(@Valid AlarmCreateRequest request) {
-        ServiceInfo serviceInfo = alarmService.create(
+        AlarmServiceInfo alarmServiceInfo = alarmService.create(
                 request.getCloudToken(),
                 request.getDeviceModel(),
                 request.getOsVersion(),
@@ -51,8 +51,8 @@ public class AlarmResource {
                 request.getBattery());
 
         ServiceCreateResponse response = new ServiceCreateResponse();
-        response.setAlarmAuthToken(serviceInfo.getAlarmAuthToken());
-        response.setPinCode(serviceInfo.getPinCode());
+        response.setAlarmAuthToken(alarmServiceInfo.getAlarmAuthToken());
+        response.setPinCode(alarmServiceInfo.getPinCode());
 
         return Response.ok(response).build();
     }

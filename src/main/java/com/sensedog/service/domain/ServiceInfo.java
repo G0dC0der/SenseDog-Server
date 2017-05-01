@@ -1,23 +1,83 @@
 package com.sensedog.service.domain;
 
+import com.sensedog.detection.DetectionType;
+import com.sensedog.repository.entry.Detection;
+import com.sensedog.repository.entry.Service;
+import com.sensedog.repository.entry.Subscriber;
+import com.sensedog.system.SystemStatus;
+
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class ServiceInfo {
 
-    private String pinCode;
-    private String alarmAuthToken;
+    private String serviceName;
+    private ZonedDateTime lastDetectionTime;
+    private DetectionType lastDetectionType;
+    private Integer numberOfDetections;
+    private SystemStatus status;
+    private List<SubscriberInfo> subscribers;
 
-    public String getPinCode() {
-        return pinCode;
+    public String getServiceName() {
+        return serviceName;
     }
 
-    public void setPinCode(String pinCode) {
-        this.pinCode = pinCode;
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
-    public String getAlarmAuthToken() {
-        return alarmAuthToken;
+    public ZonedDateTime getLastDetectionTime() {
+        return lastDetectionTime;
     }
 
-    public void setAlarmAuthToken(String alarmAuthToken) {
-        this.alarmAuthToken = alarmAuthToken;
+    public void setLastDetectionTime(ZonedDateTime lastDetectionTime) {
+        this.lastDetectionTime = lastDetectionTime;
+    }
+
+    public DetectionType getLastDetectionType() {
+        return lastDetectionType;
+    }
+
+    public void setLastDetectionType(DetectionType lastDetectionType) {
+        this.lastDetectionType = lastDetectionType;
+    }
+
+    public Integer getNumberOfDetections() {
+        return numberOfDetections;
+    }
+
+    public void setNumberOfDetections(Integer numberOfDetections) {
+        this.numberOfDetections = numberOfDetections;
+    }
+
+    public SystemStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(SystemStatus status) {
+        this.status = status;
+    }
+
+    public List<SubscriberInfo> getSubscribers() {
+        return subscribers;
+    }
+
+    public void setSubscribers(List<SubscriberInfo> subscribers) {
+        this.subscribers = subscribers;
+    }
+
+    public static ServiceInfo from(Service service) {
+        List<Detection> detections = service.getDetections();
+
+        ServiceInfo serviceInfo = new ServiceInfo();
+        serviceInfo.setLastDetectionTime(detections.isEmpty() ? null : detections.get(detections.size() - 1).getDetectionDate());
+        serviceInfo.setLastDetectionType(detections.isEmpty() ? null : detections.get(detections.size() - 1).getDetectionType());
+        serviceInfo.setNumberOfDetections(detections.size());
+        serviceInfo.setServiceName(service.getServiceName());
+        serviceInfo.setStatus(service.getStatus());
+        serviceInfo.setSubscribers(service.getSubscribers().stream().map(SubscriberInfo::from).collect(Collectors.toList()));
+
+        return serviceInfo;
     }
 }

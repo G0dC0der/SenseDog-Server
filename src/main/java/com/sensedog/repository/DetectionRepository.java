@@ -31,7 +31,7 @@ public class DetectionRepository {
 
     public List<Detection> getBetween(Integer serviceId, ZonedDateTime start, ZonedDateTime end) {
         Session session = provider.provide();
-        TypedQuery<Detection> query = session.createQuery("FROM Detection AS t WHERE t.service.serviceId = :serviceId AND t.detectionDate BETWEEN :resume AND :end", Detection.class);
+        TypedQuery<Detection> query = session.createQuery("FROM Detection AS t WHERE t.service.id = :serviceId AND t.detectionDate BETWEEN :resume AND :end", Detection.class);
         query.setParameter("serviceId", serviceId);
         query.setParameter("resume", start);
         query.setParameter("end", end);

@@ -16,7 +16,7 @@ import com.sensedog.security.Capability;
 import com.sensedog.security.Cipher;
 import com.sensedog.security.SecurityManager;
 import com.sensedog.security.Token;
-import com.sensedog.service.domain.ServiceInfo;
+import com.sensedog.service.domain.AlarmServiceInfo;
 import com.sensedog.system.SystemStatus;
 import com.sensedog.transmit.CloudClient;
 import com.sensedog.transmit.MailClient;
@@ -53,13 +53,13 @@ public class AlarmService {
         this.cloudClient = cloudClient;
     }
 
-    public ServiceInfo create(String cloudToken,
-                              String deviceModel,
-                              String osVersion,
-                              String appVersion,
-                              String carrier,
-                              String serviceName,
-                              Float battery) {
+    public AlarmServiceInfo create(String cloudToken,
+                                   String deviceModel,
+                                   String osVersion,
+                                   String appVersion,
+                                   String carrier,
+                                   String serviceName,
+                                   Float battery) {
 
         Service service = new Service();
         service.setCreationDate(ZonedDateTime.now());
@@ -86,11 +86,11 @@ public class AlarmService {
 
         serviceRepository.create(service);
 
-        ServiceInfo serviceInfo = new ServiceInfo();
-        serviceInfo.setPinCode(pinCode.getPinCode());
-        serviceInfo.setAlarmAuthToken(alarmDevice.getAuthToken());
+        AlarmServiceInfo alarmServiceInfo = new AlarmServiceInfo();
+        alarmServiceInfo.setPinCode(pinCode.getPinCode());
+        alarmServiceInfo.setAlarmAuthToken(alarmDevice.getAuthToken());
 
-        return serviceInfo;
+        return alarmServiceInfo;
     }
 
     public Severity detect(Token.Alarm token,
@@ -134,7 +134,9 @@ public class AlarmService {
 
         //Always push to master user
 
-        subscriberRepository.updateLastNotifications(warningReceivers, detection.getDetectionDate());
+        if (!warningReceivers.isEmpty()) {
+            subscriberRepository.updateLastNotifications(warningReceivers, detection.getDetectionDate());
+        }
 
         return severity;
     }

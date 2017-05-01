@@ -3,6 +3,7 @@ package com.sensedog.rest.client;
 import com.sensedog.rest.entry.request.ConnectRequest;
 import com.sensedog.rest.entry.request.InviteRequest;
 import com.sensedog.rest.entry.request.MasterUserCreateRequest;
+import com.sensedog.rest.entry.response.ServicesResponse;
 import com.sensedog.rest.entry.response.TokenResponse;
 
 import javax.ws.rs.client.Client;
@@ -50,5 +51,17 @@ public class MasterUserResourceClient {
                 .post(Entity.entity(request, MediaType.APPLICATION_JSON));
 
         return RestResponse.fromResponse(response, Void.class);
+    }
+
+    public RestResponse<ServicesResponse> viewAll(String email) {
+        Response response = client.target(baseUrl)
+                .path("master")
+                .path("view")
+                .path("all")
+                .path(email)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        return RestResponse.fromResponse(response, ServicesResponse.class);
     }
 }

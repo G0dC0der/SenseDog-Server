@@ -96,9 +96,9 @@ public class SecurityManager {
     public Service authenticate(Token token) {
         Service service;
         if (token instanceof Token.Alarm) {
-            service = serviceRepository.getByAlarmDeviceToken(token.getToken());
+            service = serviceRepository.findByAlarmDeviceToken(token.getToken());
         } else if (token instanceof  Token.Master) {
-            service = serviceRepository.getByMasterToken(token.getToken());
+            service = serviceRepository.findByMasterToken(token.getToken());
         } else {
             throw new RuntimeException("Unknown token: " + token.getClass());
         }
@@ -119,7 +119,7 @@ public class SecurityManager {
 
     public void stateVerify(Service service) {
         if (service.getStatus() != SystemStatus.ACTIVE) {
-            throw new StateViolationException("Can not connect to a service in a stopped state.");
+            throw new StateViolationException("State violation.");
         }
     }
 }

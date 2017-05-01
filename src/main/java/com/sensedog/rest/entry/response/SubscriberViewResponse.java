@@ -1,18 +1,12 @@
-package com.sensedog.rest.entry.request;
+package com.sensedog.rest.entry.response;
 
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotBlank;
+import com.sensedog.repository.entry.Subscriber;
 
-public class MasterUserCreateRequest {
+public class SubscriberViewResponse {
 
-    @NotBlank
     private String name;
-    @NotBlank
     private String phone;
-    @Email
     private String email;
-    @NotBlank
-    private String cloudToken;
 
     public String getName() {
         return name;
@@ -38,11 +32,12 @@ public class MasterUserCreateRequest {
         this.email = email;
     }
 
-    public String getCloudToken() {
-        return cloudToken;
-    }
+    public static SubscriberViewResponse from(Subscriber subscriber) {
+        SubscriberViewResponse subscriberInfo = new SubscriberViewResponse();
+        subscriberInfo.setEmail(subscriber.getEmail());
+        subscriberInfo.setName(subscriber.getName());
+        subscriberInfo.setPhone(subscriber.getPhone());
 
-    public void setCloudToken(String cloudToken) {
-        this.cloudToken = cloudToken;
+        return subscriberInfo;
     }
 }

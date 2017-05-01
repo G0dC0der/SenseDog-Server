@@ -29,11 +29,11 @@ public class MasterUserRepository {
 
     public MasterUser findByEmail(String email) {
         Session session = provider.provide();
-        Query query = session.createQuery("FROM MasterUser AS ms WHERE ms.email = :email");
+        Query<MasterUser> query = session.createQuery("FROM MasterUser AS ms WHERE ms.email = :email", MasterUser.class);
         query.setParameter("email", email);
-        Object result = query.getResultList().isEmpty() ? null : query.getSingleResult();
+        MasterUser result = query.getResultList().isEmpty() ? null : query.getSingleResult();
         session.close();
 
-        return (MasterUser) result;
+        return result;
     }
 }

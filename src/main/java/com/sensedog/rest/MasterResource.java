@@ -1,23 +1,30 @@
 package com.sensedog.rest;
 
+import com.sensedog.rest.entry.EntryConverter;
 import com.sensedog.rest.entry.request.CloudUpdateRequest;
 import com.sensedog.rest.entry.request.ConnectRequest;
 import com.sensedog.rest.entry.request.InviteRequest;
 import com.sensedog.rest.entry.request.MasterUserCreateRequest;
+import com.sensedog.rest.entry.response.ServicesResponse;
 import com.sensedog.rest.entry.response.TokenResponse;
 import com.sensedog.security.Token;
 import com.sensedog.service.UserService;
+import com.sensedog.service.domain.ServiceInfo;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("/master")
 @Produces(MediaType.APPLICATION_JSON)
@@ -65,6 +72,17 @@ public class MasterResource {
                 request.getEmail());
 
         return Response.noContent().build();
+    }
+
+    @GET
+    @Path("view/all/{email}")
+    public Response viewAll(@PathParam("email") String email) {
+        List<ServiceInfo> serviceInfos = userService.viewAll(email);
+
+        ServicesResponse servicesResponse = new ServicesResponse();
+        servicesResponse.setServices(serviceInfos.stream().map(EntryConverter::convert).collect(Collectors.toList()));
+
+        return Response.ok(servicesResponse).build();
     }
 
     @POST

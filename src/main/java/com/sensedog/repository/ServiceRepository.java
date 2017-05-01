@@ -8,6 +8,7 @@ import org.hibernate.query.Query;
 import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 public class ServiceRepository {
 
@@ -36,7 +37,7 @@ public class ServiceRepository {
         session.close();
     }
 
-    public Service getByAlarmDeviceToken(String token) {
+    public Service findByAlarmDeviceToken(String token) {
         Session session = provider.provide();
         Query query = session.createQuery("FROM Service AS s WHERE s.alarmDevice.authToken = :token");
         query.setParameter("token", token);
@@ -46,7 +47,7 @@ public class ServiceRepository {
         return (Service) result;
     }
 
-    public Service getByMasterToken(String token) {
+    public Service findByMasterToken(String token) {
         Session session = provider.provide();
         Query query = session.createQuery("FROM Service AS s WHERE s.masterAuthToken = :token");
         query.setParameter("token", token);
@@ -54,5 +55,15 @@ public class ServiceRepository {
         session.close();
 
         return (Service) result;
+    }
+
+    public Service[] findServicesByMasterEmail(String email) {
+        Session session = provider.provide();
+        Query<Service> query = session.createQuery("FROM Service AS s WHERE s.masterUser.email = :email", Service.class);
+        query.setParameter("email", email);
+        List<Service> result = query.getResultList();
+        session.close();
+
+        return result.toArray(new Service[result.size()]);
     }
 }

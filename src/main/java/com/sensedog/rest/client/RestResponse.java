@@ -33,8 +33,7 @@ public class RestResponse<T> {
     }
 
     public static <T> RestResponse<T> fromResponse(Response resp, Class<T> clazz) {
-        boolean isOk = resp.getStatus() >= 200 && resp.getStatus() <= 299;
-        if(isOk) {
+        if(resp.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
             return new RestResponse<>(resp.getStatus(), resp.readEntity(clazz), null);
         } else {
             return new RestResponse<>(resp.getStatus(), null, resp.readEntity(ErrorResponse.class));
