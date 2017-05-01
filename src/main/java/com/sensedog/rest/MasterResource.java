@@ -4,6 +4,7 @@ import com.sensedog.rest.entry.EntryConverter;
 import com.sensedog.rest.entry.request.CloudUpdateRequest;
 import com.sensedog.rest.entry.request.ConnectRequest;
 import com.sensedog.rest.entry.request.InviteRequest;
+import com.sensedog.rest.entry.request.LoginRequest;
 import com.sensedog.rest.entry.request.MasterUserCreateRequest;
 import com.sensedog.rest.entry.response.ServicesResponse;
 import com.sensedog.rest.entry.response.TokenResponse;
@@ -46,6 +47,14 @@ public class MasterResource {
                 request.getPhone(),
                 request.getEmail(),
                 request.getCloudToken());
+
+        return Response.noContent().build();
+    }
+
+    @POST
+    @Path("login")
+    public Response login(LoginRequest request) {
+        userService.login(request.getEmail());
 
         return Response.noContent().build();
     }

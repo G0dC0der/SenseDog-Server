@@ -98,6 +98,13 @@ public class UserService {
         return service.getMasterAuthToken();
     }
 
+    public void login(String email) {
+        MasterUser masterUser = masterUserRepository.findByEmail(email);
+        if (masterUser == null) {
+            throw new CredentialException("Failed to login: " + email);
+        }
+    }
+
     public void invite(Token.Master token,
                        String name,
                        String phone,

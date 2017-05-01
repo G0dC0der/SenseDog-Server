@@ -3,7 +3,6 @@ package com.sensedog.service.domain;
 import com.sensedog.detection.DetectionType;
 import com.sensedog.repository.entry.Detection;
 import com.sensedog.repository.entry.Service;
-import com.sensedog.repository.entry.Subscriber;
 import com.sensedog.system.SystemStatus;
 
 import java.time.ZonedDateTime;
@@ -13,6 +12,7 @@ import java.util.stream.Collectors;
 public class ServiceInfo {
 
     private String serviceName;
+    private String masterToken;
     private ZonedDateTime lastDetectionTime;
     private DetectionType lastDetectionType;
     private Integer numberOfDetections;
@@ -67,6 +67,14 @@ public class ServiceInfo {
         this.subscribers = subscribers;
     }
 
+    public String getMasterToken() {
+        return masterToken;
+    }
+
+    public void setMasterToken(String masterToken) {
+        this.masterToken = masterToken;
+    }
+
     public static ServiceInfo from(Service service) {
         List<Detection> detections = service.getDetections();
 
@@ -77,6 +85,7 @@ public class ServiceInfo {
         serviceInfo.setServiceName(service.getServiceName());
         serviceInfo.setStatus(service.getStatus());
         serviceInfo.setSubscribers(service.getSubscribers().stream().map(SubscriberInfo::from).collect(Collectors.toList()));
+        serviceInfo.setMasterToken(service.getMasterAuthToken());
 
         return serviceInfo;
     }
