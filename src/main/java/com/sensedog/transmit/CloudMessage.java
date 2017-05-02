@@ -6,8 +6,8 @@ import java.util.Map;
 
 public class CloudMessage<T> {
 
-    private T data;
-    private String to;
+    private final T data;
+    private final String to;
 
     private CloudMessage(T data, String to) {
         this.to = to;

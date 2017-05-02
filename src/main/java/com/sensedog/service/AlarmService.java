@@ -9,9 +9,11 @@ import com.sensedog.repository.ServiceRepository;
 import com.sensedog.repository.SubscriberRepository;
 import com.sensedog.repository.entry.AlarmDevice;
 import com.sensedog.repository.entry.Detection;
+import com.sensedog.repository.entry.MasterUser;
 import com.sensedog.repository.entry.PinCode;
 import com.sensedog.repository.entry.Service;
 import com.sensedog.repository.entry.Subscriber;
+import com.sensedog.security.AlertMessage;
 import com.sensedog.security.Capability;
 import com.sensedog.security.Cipher;
 import com.sensedog.security.SecurityManager;
@@ -19,6 +21,7 @@ import com.sensedog.security.Token;
 import com.sensedog.service.domain.AlarmServiceInfo;
 import com.sensedog.system.SystemStatus;
 import com.sensedog.transmit.CloudClient;
+import com.sensedog.transmit.CloudMessage;
 import com.sensedog.transmit.MailClient;
 
 import javax.inject.Inject;
@@ -97,8 +100,8 @@ public class AlarmService {
                        DetectionType detectionType,
                        String value) {
         Service service = securityManager.authenticate(token);
+        MasterUser masterUser = securityManager.requireMaster(service);
         securityManager.stateVerify(service);
-        securityManager.requireMaster(service);
 
         Severity severity = securityManager.determineSeverity(service, detectionType);
 
@@ -126,13 +129,14 @@ public class AlarmService {
 
         if (severity.isAboveOrEqual(Severity.WARNING)) {
             //Send text
-            //Push message
         }
         if (severity.isAboveOrEqual(Severity.CRITICAL)) {
             //Call text
         }
 
-        //Always push to master user
+        AlertMessage alertMessage = new AlertMessage();
+        alertMessage.setMessage("Your alarm device have detected suspicious movement.");
+        cloudClient.send(CloudMessage.from(alertMessage, masterUser.getCloudToken()));
 
         if (!warningReceivers.isEmpty()) {
             subscriberRepository.updateLastNotifications(warningReceivers, detection.getDetectionDate());
