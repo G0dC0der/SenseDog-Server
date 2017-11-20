@@ -10,7 +10,7 @@ public class Strings {
 
     public static String junk() {
         final int size = 10;
-        StringBuilder bu = new StringBuilder(size);
+        final StringBuilder bu = new StringBuilder(size);
         for (int i = 0; i < size; i++) {
             bu.append(ALPHABET[RANDOM.nextInt(ALPHABET.length)]);
         }
@@ -20,7 +20,7 @@ public class Strings {
 
     public static String numbers() {
         final int size = 10;
-        StringBuilder bu = new StringBuilder(size);
+        final StringBuilder bu = new StringBuilder(size);
         for (int i = 0; i < size; i++) {
             bu.append(NUMBERS[RANDOM.nextInt(NUMBERS.length)]);
         }

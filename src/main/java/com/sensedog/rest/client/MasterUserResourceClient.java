@@ -1,10 +1,10 @@
 package com.sensedog.rest.client;
 
-import com.sensedog.rest.entry.request.ConnectRequest;
-import com.sensedog.rest.entry.request.InviteRequest;
-import com.sensedog.rest.entry.request.MasterUserCreateRequest;
-import com.sensedog.rest.entry.response.ServicesResponse;
-import com.sensedog.rest.entry.response.TokenResponse;
+import com.sensedog.rest.model.request.ApiConnect;
+import com.sensedog.rest.model.request.ApiInvite;
+import com.sensedog.rest.model.request.ApiMasterUserCreate;
+import com.sensedog.rest.model.ApiServices;
+import com.sensedog.rest.model.ApiToken;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -17,13 +17,13 @@ public class MasterUserResourceClient {
     private String baseUrl;
     private Client client;
 
-    public MasterUserResourceClient(String baseUrl) {
+    public MasterUserResourceClient(final String baseUrl) {
         this.baseUrl = baseUrl;
         this.client = ClientBuilder.newClient();
     }
 
-    public RestResponse<Void> newMasterUser(MasterUserCreateRequest request) {
-        Response response = client.target(baseUrl)
+    public RestResponse<Void> newMasterUser(final ApiMasterUserCreate request) {
+        final Response response = client.target(baseUrl)
                 .path("master")
                 .path("new")
                 .request(MediaType.APPLICATION_JSON_TYPE)
@@ -32,18 +32,18 @@ public class MasterUserResourceClient {
         return RestResponse.fromResponse(response, Void.class);
     }
 
-    public RestResponse<TokenResponse> connect(ConnectRequest request) {
-        Response response = client.target(baseUrl)
+    public RestResponse<ApiToken> connect(final ApiConnect request) {
+        final Response response = client.target(baseUrl)
                 .path("master")
                 .path("connect")
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .post(Entity.entity(request, MediaType.APPLICATION_JSON));
 
-        return RestResponse.fromResponse(response, TokenResponse.class);
+        return RestResponse.fromResponse(response, ApiToken.class);
     }
 
-    public RestResponse<Void> invite(String masterAuthToken, InviteRequest request) {
-        Response response = client.target(baseUrl)
+    public RestResponse<Void> invite(final String masterAuthToken, final ApiInvite request) {
+        final Response response = client.target(baseUrl)
                 .path("master")
                 .path("invite")
                 .request(MediaType.APPLICATION_JSON_TYPE)
@@ -53,8 +53,8 @@ public class MasterUserResourceClient {
         return RestResponse.fromResponse(response, Void.class);
     }
 
-    public RestResponse<ServicesResponse> viewAll(String email) {
-        Response response = client.target(baseUrl)
+    public RestResponse<ApiServices> viewAll(final String email) {
+        final Response response = client.target(baseUrl)
                 .path("master")
                 .path("view")
                 .path("all")
@@ -62,6 +62,6 @@ public class MasterUserResourceClient {
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .get();
 
-        return RestResponse.fromResponse(response, ServicesResponse.class);
+        return RestResponse.fromResponse(response, ApiServices.class);
     }
 }

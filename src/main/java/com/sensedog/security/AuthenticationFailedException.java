@@ -5,7 +5,7 @@ public class AuthenticationFailedException extends RuntimeException {
     public AuthenticationFailedException() {
     }
 
-    public AuthenticationFailedException(String message) {
+    public AuthenticationFailedException(final String message) {
         super(message);
     }
 }

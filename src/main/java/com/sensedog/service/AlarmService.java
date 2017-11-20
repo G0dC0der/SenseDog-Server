@@ -7,28 +7,30 @@ import com.sensedog.repository.AlarmDeviceRepository;
 import com.sensedog.repository.DetectionRepository;
 import com.sensedog.repository.ServiceRepository;
 import com.sensedog.repository.SubscriberRepository;
-import com.sensedog.repository.entry.AlarmDevice;
-import com.sensedog.repository.entry.Detection;
-import com.sensedog.repository.entry.MasterUser;
-import com.sensedog.repository.entry.PinCode;
-import com.sensedog.repository.entry.Service;
-import com.sensedog.repository.entry.Subscriber;
+import com.sensedog.repository.model.SqlAlarmDevice;
+import com.sensedog.repository.model.SqlDetection;
+import com.sensedog.repository.model.SqlMaster;
+import com.sensedog.repository.model.SqlPincode;
+import com.sensedog.repository.model.SqlService;
+import com.sensedog.repository.model.SqlSubscriber;
 import com.sensedog.security.AlertMessage;
 import com.sensedog.security.Capability;
 import com.sensedog.security.Cipher;
 import com.sensedog.security.SecurityManager;
 import com.sensedog.security.Token;
-import com.sensedog.service.domain.AlarmServiceInfo;
+import com.sensedog.service.model.AlarmServiceInfo;
 import com.sensedog.system.SystemStatus;
-import com.sensedog.transmit.CloudClient;
-import com.sensedog.transmit.CloudMessage;
-import com.sensedog.transmit.MailClient;
+import com.sensedog.communication.cloud.CloudClient;
+import com.sensedog.communication.cloud.CloudMessage;
+import com.sensedog.communication.mail.MailClient;
+import org.jvnet.hk2.annotations.Service;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class AlarmService {
 
     private final ServiceRepository serviceRepository;
@@ -56,56 +58,56 @@ public class AlarmService {
         this.cloudClient = cloudClient;
     }
 
-    public AlarmServiceInfo create(String cloudToken,
-                                   String deviceModel,
-                                   String osVersion,
-                                   String appVersion,
-                                   String carrier,
-                                   String serviceName,
-                                   Float battery) {
+    public AlarmServiceInfo create(final String cloudToken,
+                                   final String deviceModel,
+                                   final String osVersion,
+                                   final String appVersion,
+                                   final String carrier,
+                                   final String serviceName,
+                                   final Float battery) {
 
-        Service service = new Service();
+        final SqlService service = new SqlService();
         service.setCreationDate(ZonedDateTime.now());
         service.setStatus(SystemStatus.STOPPED);
         service.setServiceName(serviceName);
 
-        PinCode pinCode = new PinCode();
+        final SqlPincode pinCode = new SqlPincode();
         pinCode.setPinCode(Cipher.pinCode());
         pinCode.setCreationDate(ZonedDateTime.now());
         pinCode.setService(service);
 
-        AlarmDevice alarmDevice = new AlarmDevice();
-        alarmDevice.setCloudToken(cloudToken);
-        alarmDevice.setDeviceModel(deviceModel);
-        alarmDevice.setOsVersion(osVersion);
-        alarmDevice.setAppVersion(appVersion);
-        alarmDevice.setCarrier(carrier);
-        alarmDevice.setAuthToken(Cipher.authToken());
-        alarmDevice.setBattery(battery);
-        alarmDevice.setService(service);
+        final SqlAlarmDevice sqlAlarmDevice = new SqlAlarmDevice();
+        sqlAlarmDevice.setCloudToken(cloudToken);
+        sqlAlarmDevice.setDeviceModel(deviceModel);
+        sqlAlarmDevice.setOsVersion(osVersion);
+        sqlAlarmDevice.setAppVersion(appVersion);
+        sqlAlarmDevice.setCarrier(carrier);
+        sqlAlarmDevice.setAuthToken(Cipher.authToken());
+        sqlAlarmDevice.setBattery(battery);
+        sqlAlarmDevice.setService(service);
 
         service.setPinCode(pinCode);
-        service.setAlarmDevice(alarmDevice);
+        service.setAlarmDevice(sqlAlarmDevice);
 
         serviceRepository.create(service);
 
-        AlarmServiceInfo alarmServiceInfo = new AlarmServiceInfo();
+        final AlarmServiceInfo alarmServiceInfo = new AlarmServiceInfo();
         alarmServiceInfo.setPinCode(pinCode.getPinCode());
-        alarmServiceInfo.setAlarmAuthToken(alarmDevice.getAuthToken());
+        alarmServiceInfo.setAlarmAuthToken(sqlAlarmDevice.getAuthToken());
 
         return alarmServiceInfo;
     }
 
-    public Severity detect(Token.Alarm token,
-                       DetectionType detectionType,
-                       String value) {
-        Service service = securityManager.authenticate(token);
-        MasterUser masterUser = securityManager.requireMaster(service);
+    public Severity detect(final Token.Alarm token,
+                           final DetectionType detectionType,
+                           final String value) {
+        final SqlService service = securityManager.authenticate(token);
+        final SqlMaster masterUser = securityManager.requireMaster(service);
         securityManager.stateVerify(service);
 
-        Severity severity = securityManager.determineSeverity(service, detectionType);
+        final Severity severity = securityManager.determineSeverity(service, detectionType);
 
-        Detection detection = new Detection();
+        final SqlDetection detection = new SqlDetection();
         detection.setDetectionDate(ZonedDateTime.now());
         detection.setDetectionType(detectionType);
         detection.setValue(value);
@@ -115,7 +117,7 @@ public class AlarmService {
         detectionRepository.save(detection);
         alarmDeviceRepository.updateLastSeen(service.getId(), ZonedDateTime.now());
 
-        List<Subscriber> warningReceivers = service
+        final List<SqlSubscriber> warningReceivers = service
                 .getSubscribers()
                 .stream()
                 .filter(subscriber -> subscriber.getMinimumSeverity().isAboveOrEqual(severity))
@@ -134,7 +136,7 @@ public class AlarmService {
             //Call text
         }
 
-        AlertMessage alertMessage = new AlertMessage();
+        final AlertMessage alertMessage = new AlertMessage();
         alertMessage.setMessage("Your alarm device have detected suspicious movement.");
         cloudClient.send(CloudMessage.from(alertMessage, masterUser.getCloudToken()));
 
@@ -145,14 +147,14 @@ public class AlarmService {
         return severity;
     }
 
-    public void start(Token token) {
-        Service service = securityManager.authenticate(token);
+    public void start(final Token token) {
+        final SqlService service = securityManager.authenticate(token);
         service.setStatus(service.getMasterUser() != null ? SystemStatus.ACTIVE : SystemStatus.STOPPED);
         serviceRepository.update(service);
     }
 
-    public void stop(Token token) {
-        Service  service = securityManager.authenticate(token);
+    public void stop(final Token token) {
+        final SqlService service = securityManager.authenticate(token);
         service.setStatus(SystemStatus.STOPPED);
         serviceRepository.update(service);
     }

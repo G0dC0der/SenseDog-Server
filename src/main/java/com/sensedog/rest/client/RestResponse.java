@@ -1,6 +1,6 @@
 package com.sensedog.rest.client;
 
-import com.sensedog.rest.entry.response.ErrorResponse;
+import com.sensedog.rest.model.ApiError;
 
 import javax.ws.rs.core.Response;
 
@@ -8,12 +8,12 @@ public class RestResponse<T> {
 
     public final int statusCode;
     public final T entity;
-    public final ErrorResponse errorResponse;
+    public final ApiError apiError;
 
-    private RestResponse(int statusCode, T entity, ErrorResponse errorResponse) {
+    private RestResponse(final int statusCode, final T entity, final ApiError apiError) {
         this.statusCode = statusCode;
         this.entity = entity;
-        this.errorResponse = errorResponse;
+        this.apiError = apiError;
     }
 
     public boolean isOk() {
@@ -32,11 +32,11 @@ public class RestResponse<T> {
         return statusCode >= 500 &&  statusCode <= 599;
     }
 
-    public static <T> RestResponse<T> fromResponse(Response resp, Class<T> clazz) {
+    public static <T> RestResponse<T> fromResponse(final Response resp, final Class<T> clazz) {
         if(resp.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
             return new RestResponse<>(resp.getStatus(), resp.readEntity(clazz), null);
         } else {
-            return new RestResponse<>(resp.getStatus(), null, resp.readEntity(ErrorResponse.class));
+            return new RestResponse<>(resp.getStatus(), null, resp.readEntity(ApiError.class));
         }
     }
 }

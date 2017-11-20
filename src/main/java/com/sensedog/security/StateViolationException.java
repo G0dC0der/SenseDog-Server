@@ -5,19 +5,19 @@ public class StateViolationException extends RuntimeException {
     public StateViolationException() {
     }
 
-    public StateViolationException(String message) {
+    public StateViolationException(final String message) {
         super(message);
     }
 
-    public StateViolationException(String message, Throwable cause) {
+    public StateViolationException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public StateViolationException(Throwable cause) {
+    public StateViolationException(final Throwable cause) {
         super(cause);
     }
 
-    public StateViolationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public StateViolationException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

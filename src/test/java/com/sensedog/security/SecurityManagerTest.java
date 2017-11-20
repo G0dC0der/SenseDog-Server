@@ -4,11 +4,10 @@ import com.sensedog.detection.DetectionType;
 import com.sensedog.detection.Severity;
 import com.sensedog.repository.DetectionRepository;
 import com.sensedog.repository.ServiceRepository;
-import com.sensedog.repository.entry.Detection;
-import com.sensedog.repository.entry.PinCode;
-import com.sensedog.repository.entry.Service;
+import com.sensedog.repository.model.SqlDetection;
+import com.sensedog.repository.model.SqlPincode;
+import com.sensedog.repository.model.SqlService;
 import com.sensedog.test.EntryUtil;
-import com.sensedog.test.Strings;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -18,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static com.sensedog.test.Strings.junk;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -42,7 +40,7 @@ public class SecurityManagerTest {
 
     @Test
     public void exceptNotExpired() {
-        PinCode pinCode = new PinCode();
+        final SqlPincode pinCode = new SqlPincode();
 
         pinCode.setCreationDate(ZonedDateTime.now());
         assertFalse(securityManager.hasExpired(pinCode));
@@ -62,7 +60,7 @@ public class SecurityManagerTest {
 
     @Test
     public void exceptExpired() {
-        PinCode pinCode = new PinCode();
+        final SqlPincode pinCode = new SqlPincode();
 
         pinCode.setCreationDate(ZonedDateTime.now().minusMinutes(expireDelay));
         assertTrue(securityManager.hasExpired(pinCode));
@@ -78,62 +76,62 @@ public class SecurityManagerTest {
     public void assertSuspiciousSeverityWhenNothing() {
         when(detectionRepository.getBetween(anyObject(), anyObject(), anyObject())).thenReturn(new ArrayList<>());
 
-        Severity severity = securityManager.determineSeverity(new Service(), DetectionType.ROTATION);
+        final Severity severity = securityManager.determineSeverity(new SqlService(), DetectionType.ROTATION);
         assertEquals(Severity.SUSPICIOUS, severity);
     }
 
     @Test
     public void assertSuspiciousSeverityWhenFuture() {
-        Detection detection = EntryUtil.detection(ZonedDateTime.now().plusSeconds(30));
+        final SqlDetection detection = EntryUtil.detection(ZonedDateTime.now().plusSeconds(30));
         when(detectionRepository.getBetween(anyObject(), anyObject(), anyObject())).thenReturn(Collections.singletonList(detection));
 
-        Severity severity = securityManager.determineSeverity(new Service(), DetectionType.ROTATION);
+        final Severity severity = securityManager.determineSeverity(new SqlService(), DetectionType.ROTATION);
         assertEquals(Severity.SUSPICIOUS, severity);
     }
 
     @Test
     public void assertWarningSeverity() {
-        Detection detection1 = EntryUtil.detection(ZonedDateTime.now());
-        Detection detection2 = EntryUtil.detection(ZonedDateTime.now().minusSeconds(30));
-        Detection detection3 = EntryUtil.detection(ZonedDateTime.now().plusSeconds(30));
+        final SqlDetection detection1 = EntryUtil.detection(ZonedDateTime.now());
+        final SqlDetection detection2 = EntryUtil.detection(ZonedDateTime.now().minusSeconds(30));
+        final SqlDetection detection3 = EntryUtil.detection(ZonedDateTime.now().plusSeconds(30));
 
         when(detectionRepository.getBetween(anyObject(), anyObject(), anyObject())).thenReturn(Arrays.asList(detection1, detection2, detection3));
-        Severity severity = securityManager.determineSeverity(new Service(), DetectionType.ROTATION);
+        final Severity severity = securityManager.determineSeverity(new SqlService(), DetectionType.ROTATION);
         assertEquals(Severity.WARNING, severity);
     }
 
     @Test
     public void assertWarningSeverityTwo() {
-        Detection detection1 = EntryUtil.detection(ZonedDateTime.now());
-        Detection detection2 = EntryUtil.detection(ZonedDateTime.now().minusSeconds(1));
-        Detection detection3 = EntryUtil.detection(ZonedDateTime.now().plusSeconds(30));
+        final SqlDetection detection1 = EntryUtil.detection(ZonedDateTime.now());
+        final SqlDetection detection2 = EntryUtil.detection(ZonedDateTime.now().minusSeconds(1));
+        final SqlDetection detection3 = EntryUtil.detection(ZonedDateTime.now().plusSeconds(30));
 
         when(detectionRepository.getBetween(anyObject(), anyObject(), anyObject())).thenReturn(Arrays.asList(detection1, detection2, detection3));
-        Severity severity = securityManager.determineSeverity(new Service(), DetectionType.ROTATION);
+        final Severity severity = securityManager.determineSeverity(new SqlService(), DetectionType.ROTATION);
         assertEquals(Severity.WARNING, severity);
     }
 
     @Test
     public void assertCriticalSeverity() {
-        Detection detection1 = EntryUtil.detection(ZonedDateTime.now());
-        Detection detection2 = EntryUtil.detection(ZonedDateTime.now().minusSeconds(25));
-        Detection detection3 = EntryUtil.detection(ZonedDateTime.now().minusSeconds(40));
-        Detection detection4 = EntryUtil.detection(ZonedDateTime.now().plusSeconds(30));
+        final SqlDetection detection1 = EntryUtil.detection(ZonedDateTime.now());
+        final SqlDetection detection2 = EntryUtil.detection(ZonedDateTime.now().minusSeconds(25));
+        final SqlDetection detection3 = EntryUtil.detection(ZonedDateTime.now().minusSeconds(40));
+        final SqlDetection detection4 = EntryUtil.detection(ZonedDateTime.now().plusSeconds(30));
 
         when(detectionRepository.getBetween(anyObject(), anyObject(), anyObject())).thenReturn(Arrays.asList(detection1, detection2, detection3, detection4));
-        Severity severity = securityManager.determineSeverity(new Service(), DetectionType.ROTATION);
+        final Severity severity = securityManager.determineSeverity(new SqlService(), DetectionType.ROTATION);
         assertEquals(Severity.CRITICAL, severity);
     }
 
     @Test
     public void assertCriticalSeverityTwo() {
-        Detection detection1 = EntryUtil.detection(ZonedDateTime.now());
-        Detection detection2 = EntryUtil.detection(ZonedDateTime.now().minusSeconds(30));
-        Detection detection3 = EntryUtil.detection(ZonedDateTime.now().minusSeconds(60));
-        Detection detection4 = EntryUtil.detection(ZonedDateTime.now().plusSeconds(30));
+        final SqlDetection detection1 = EntryUtil.detection(ZonedDateTime.now());
+        final SqlDetection detection2 = EntryUtil.detection(ZonedDateTime.now().minusSeconds(30));
+        final SqlDetection detection3 = EntryUtil.detection(ZonedDateTime.now().minusSeconds(60));
+        final SqlDetection detection4 = EntryUtil.detection(ZonedDateTime.now().plusSeconds(30));
 
         when(detectionRepository.getBetween(anyObject(), anyObject(), anyObject())).thenReturn(Arrays.asList(detection1, detection2, detection3, detection4));
-        Severity severity = securityManager.determineSeverity(new Service(), DetectionType.ROTATION);
+        final Severity severity = securityManager.determineSeverity(new SqlService(), DetectionType.ROTATION);
         assertEquals(Severity.CRITICAL, severity);
     }
 

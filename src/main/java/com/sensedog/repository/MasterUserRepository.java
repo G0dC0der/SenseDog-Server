@@ -1,37 +1,39 @@
 package com.sensedog.repository;
 
-import com.sensedog.repository.entry.MasterUser;
+import com.sensedog.repository.model.SqlMaster;
 import com.sensedog.system.SessionProvider;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.jvnet.hk2.annotations.Service;
 
 import javax.inject.Inject;
 import java.io.Serializable;
 
+@Service
 public class MasterUserRepository {
 
     private final SessionProvider provider;
 
     @Inject
-    public MasterUserRepository(SessionProvider provider) {
+    public MasterUserRepository(final SessionProvider provider) {
         this.provider = provider;
     }
 
-    public Integer save(MasterUser masterUser) {
-        Session session = provider.provide();
+    public Integer save(final SqlMaster masterUser) {
+        final Session session = provider.provide();
         session.getTransaction().begin();
-        Serializable id = session.save(masterUser);
+        final Serializable id = session.save(masterUser);
         session.getTransaction().commit();
         session.close();
 
         return (Integer) id;
     }
 
-    public MasterUser findByEmail(String email) {
-        Session session = provider.provide();
-        Query<MasterUser> query = session.createQuery("FROM MasterUser AS ms WHERE ms.email = :email", MasterUser.class);
+    public SqlMaster findByEmail(final String email) {
+        final Session session = provider.provide();
+        final Query<SqlMaster> query = session.createQuery("FROM MasterUser AS ms WHERE ms.email = :email", SqlMaster.class);
         query.setParameter("email", email);
-        MasterUser result = query.getResultList().isEmpty() ? null : query.getSingleResult();
+        final SqlMaster result = query.getResultList().isEmpty() ? null : query.getSingleResult();
         session.close();
 
         return result;

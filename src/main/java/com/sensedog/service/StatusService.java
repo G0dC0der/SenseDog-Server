@@ -1,16 +1,18 @@
 package com.sensedog.service;
 
 import com.sensedog.repository.ServiceRepository;
-import com.sensedog.repository.entry.AlarmDevice;
-import com.sensedog.repository.entry.Service;
+import com.sensedog.repository.model.SqlAlarmDevice;
+import com.sensedog.repository.model.SqlService;
 import com.sensedog.security.SecurityManager;
 import com.sensedog.security.Token;
-import com.sensedog.service.domain.HealthStatus;
+import com.sensedog.service.model.HealthStatus;
 import com.sensedog.system.SystemStatus;
+import org.jvnet.hk2.annotations.Service;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 
+@Service
 public class StatusService {
 
     private final SecurityManager securityManager;
@@ -23,29 +25,29 @@ public class StatusService {
         this.serviceRepository = serviceRepository;
     }
 
-    public void report(Token.Alarm token, Float battery) {
-        Service service = securityManager.authenticate(token);
+    public void report(final Token.Alarm token, final Float battery) {
+        final SqlService service = securityManager.authenticate(token);
         service.setStatus(SystemStatus.ACTIVE);
 
-        AlarmDevice alarmDevice = service.getAlarmDevice();
-        alarmDevice.setBattery(battery);
-        alarmDevice.setLastSeen(ZonedDateTime.now());
+        final SqlAlarmDevice sqlAlarmDevice = service.getAlarmDevice();
+        sqlAlarmDevice.setBattery(battery);
+        sqlAlarmDevice.setLastSeen(ZonedDateTime.now());
 
         serviceRepository.update(service);
     }
 
-    public HealthStatus read(Token token) {
-        Service service = securityManager.authenticate(token);
-        AlarmDevice alarmDevice = service.getAlarmDevice();
+    public HealthStatus read(final Token token) {
+        final SqlService service = securityManager.authenticate(token);
+        final SqlAlarmDevice sqlAlarmDevice = service.getAlarmDevice();
 
-        if (service.getStatus().isActive() && securityManager.isLost(alarmDevice)) {
+        if (service.getStatus().isActive() && securityManager.isLost(sqlAlarmDevice)) {
             service.setStatus(SystemStatus.STOPPED);
             serviceRepository.update(service);
         }
 
-        HealthStatus healthStatus = new HealthStatus();
-        healthStatus.setBattery(alarmDevice.getBattery());
-        healthStatus.setLastSeen(alarmDevice.getLastSeen());
+        final HealthStatus healthStatus = new HealthStatus();
+        healthStatus.setBattery(sqlAlarmDevice.getBattery());
+        healthStatus.setLastSeen(sqlAlarmDevice.getLastSeen());
         healthStatus.setSystemStatus(service.getStatus());
 
         return healthStatus;

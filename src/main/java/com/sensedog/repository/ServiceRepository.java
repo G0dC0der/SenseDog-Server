@@ -1,15 +1,15 @@
 package com.sensedog.repository;
 
-import com.sensedog.repository.entry.Service;
+import com.sensedog.repository.model.SqlService;
 import com.sensedog.system.SessionProvider;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import javax.inject.Inject;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
+@org.jvnet.hk2.annotations.Service
 public class ServiceRepository {
 
     private final SessionProvider provider;
@@ -19,51 +19,51 @@ public class ServiceRepository {
         this.provider = provider;
     }
 
-    public Integer create(Service service) {
-        Session session = provider.provide();
+    public Integer create(final SqlService service) {
+        final Session session = provider.provide();
         session.getTransaction().begin();
-        Serializable id = session.save(service);
+        final Serializable id = session.save(service);
         session.getTransaction().commit();
         session.close();
 
         return (Integer) id;
     }
 
-    public void update(Service service) {
-        Session session = provider.provide();
+    public void update(final SqlService service) {
+        final Session session = provider.provide();
         session.getTransaction().begin();
         session.update(service);
         session.getTransaction().commit();
         session.close();
     }
 
-    public Service findByAlarmDeviceToken(String token) {
-        Session session = provider.provide();
-        Query query = session.createQuery("FROM Service AS s WHERE s.alarmDevice.authToken = :token");
+    public SqlService findByAlarmDeviceToken(final String token) {
+        final Session session = provider.provide();
+        final Query query = session.createQuery("FROM Service AS s WHERE s.alarmDevice.authToken = :token");
         query.setParameter("token", token);
-        Object result = query.getResultList().isEmpty() ? null : query.getSingleResult();
+        final Object result = query.getResultList().isEmpty() ? null : query.getSingleResult();
         session.close();
 
-        return (Service) result;
+        return (SqlService) result;
     }
 
-    public Service findByMasterToken(String token) {
-        Session session = provider.provide();
-        Query query = session.createQuery("FROM Service AS s WHERE s.masterAuthToken = :token");
+    public SqlService findByMasterToken(final String token) {
+        final Session session = provider.provide();
+        final Query query = session.createQuery("FROM Service AS s WHERE s.masterAuthToken = :token");
         query.setParameter("token", token);
-        Object result = query.getResultList().isEmpty() ? null : query.getSingleResult();
+        final Object result = query.getResultList().isEmpty() ? null : query.getSingleResult();
         session.close();
 
-        return (Service) result;
+        return (SqlService) result;
     }
 
-    public Service[] findServicesByMasterEmail(String email) {
-        Session session = provider.provide();
-        Query<Service> query = session.createQuery("FROM Service AS s WHERE s.masterUser.email = :email", Service.class);
+    public SqlService[] findServicesByMasterEmail(final String email) {
+        final Session session = provider.provide();
+        final Query<SqlService> query = session.createQuery("FROM Service AS s WHERE s.masterUser.email = :email", SqlService.class);
         query.setParameter("email", email);
-        List<Service> result = query.getResultList();
+        final List<SqlService> result = query.getResultList();
         session.close();
 
-        return result.toArray(new Service[result.size()]);
+        return result.toArray(new SqlService[result.size()]);
     }
 }

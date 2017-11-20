@@ -7,25 +7,25 @@ import java.util.Properties;
 
 public class PropertyUtil {
 
-    public static String readSingle(String propertyPath, String key) {
-        String value;
-        try (InputStream in = PropertyUtil.class.getClassLoader().getResourceAsStream(propertyPath)) {
-            Properties properties = new Properties();
+    public static String readSingle(final String propertyPath, final String key) {
+        final String value;
+        try (final InputStream in = PropertyUtil.class.getClassLoader().getResourceAsStream(propertyPath)) {
+            final Properties properties = new Properties();
             properties.load(in);
             value = properties.getProperty(key);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new UncheckedIOException(e);
         }
 
         return value;
     }
 
-    public static Properties readProperties(String propertyPath) {
-        try (InputStream in = PropertyUtil.class.getClassLoader().getResourceAsStream(propertyPath)) {
-            Properties properties = new Properties();
+    public static Properties readProperties(final String propertyPath) {
+        try (final InputStream in = PropertyUtil.class.getClassLoader().getResourceAsStream(propertyPath)) {
+            final Properties properties = new Properties();
             properties.load(in);
             return properties;
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new UncheckedIOException(e);
         }
     }

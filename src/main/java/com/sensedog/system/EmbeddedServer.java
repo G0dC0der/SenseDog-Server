@@ -10,18 +10,18 @@ public class EmbeddedServer {
 
     private Server server;
 
-    private EmbeddedServer(Builder builder) {
+    private EmbeddedServer(final Builder builder) {
         try {
-            ServletHolder jerseyServlet = new ServletHolder(new ServletContainer(ResourceConfig.forApplicationClass(builder.resourceConfig)));
+            final ServletHolder jerseyServlet = new ServletHolder(new ServletContainer(ResourceConfig.forApplicationClass(builder.resourceConfig)));
             jerseyServlet.setInitOrder(0);
 
-            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+            final ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
             context.setContextPath("/" + builder.contextPath);
             context.addServlet(jerseyServlet, "/*");
 
             server = new Server(builder.port);
             server.setHandler(context);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -30,7 +30,7 @@ public class EmbeddedServer {
         try {
             server.start();
             server.join();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         } finally {
             server.destroy();
@@ -40,7 +40,7 @@ public class EmbeddedServer {
     public void stop() {
         try {
             server.stop();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -58,17 +58,17 @@ public class EmbeddedServer {
         private Builder() {
         }
 
-        public Builder setPort(int port) {
+        public Builder setPort(final int port) {
             this.port = port;
             return this;
         }
 
-        public Builder setContextPath(String contextPath) {
+        public Builder setContextPath(final String contextPath) {
             this.contextPath = contextPath;
             return this;
         }
 
-        public Builder setResourceConfig(Class<? extends ResourceConfig> resourceConfig) {
+        public Builder setResourceConfig(final Class<? extends ResourceConfig> resourceConfig) {
             this.resourceConfig = resourceConfig;
             return this;
         }

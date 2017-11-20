@@ -3,20 +3,20 @@ package com.sensedog.security;
 public class Token {
 
     public static class Alarm extends Token {
-        public Alarm(String token) {
+        public Alarm(final String token) {
             super(token);
         }
     }
 
     public static class Master extends Token {
-        public Master(String token) {
+        public Master(final String token) {
             super(token);
         }
     }
 
     private final transient String token;
 
-    private Token(String token) {
+    private Token(final String token) {
         if (token == null || token.isEmpty()) {
             throw new CredentialException("Token is null.");
         }

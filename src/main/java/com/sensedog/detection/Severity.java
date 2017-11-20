@@ -8,15 +8,15 @@ public enum Severity {
 
     private final int grade;
 
-    Severity(int grade) {
+    Severity(final int grade) {
         this.grade = grade;
     }
 
-    public boolean isAbove(Severity severity) {
+    public boolean isAbove(final Severity severity) {
         return grade > severity.grade;
     }
 
-    public boolean isAboveOrEqual(Severity severity) {
+    public boolean isAboveOrEqual(final Severity severity) {
         return grade >= severity.grade;
     }
 }

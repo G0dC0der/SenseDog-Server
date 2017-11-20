@@ -1,8 +1,9 @@
 package com.sensedog.repository;
 
-import com.sensedog.repository.entry.Detection;
+import com.sensedog.repository.model.SqlDetection;
 import com.sensedog.system.SessionProvider;
 import org.hibernate.Session;
+import org.jvnet.hk2.annotations.Service;
 
 import javax.inject.Inject;
 import javax.persistence.TypedQuery;
@@ -10,6 +11,7 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+@Service
 public class DetectionRepository {
 
     private final SessionProvider provider;
@@ -19,23 +21,23 @@ public class DetectionRepository {
         this.provider = provider;
     }
 
-    public Integer save(Detection detection) {
-        Session session = provider.provide();
+    public Integer save(final SqlDetection detection) {
+        final Session session = provider.provide();
         session.getTransaction().begin();
-        Serializable id = session.save(detection);
+        final Serializable id = session.save(detection);
         session.getTransaction().commit();
         session.close();
 
         return (Integer) id;
     }
 
-    public List<Detection> getBetween(Integer serviceId, ZonedDateTime start, ZonedDateTime end) {
-        Session session = provider.provide();
-        TypedQuery<Detection> query = session.createQuery("FROM Detection AS t WHERE t.service.id = :serviceId AND t.detectionDate BETWEEN :resume AND :end", Detection.class);
+    public List<SqlDetection> getBetween(final Integer serviceId, final ZonedDateTime start, final ZonedDateTime end) {
+        final Session session = provider.provide();
+        final TypedQuery<SqlDetection> query = session.createQuery("FROM Detection AS t WHERE t.service.id = :serviceId AND t.detectionDate BETWEEN :resume AND :end", SqlDetection.class);
         query.setParameter("serviceId", serviceId);
         query.setParameter("resume", start);
         query.setParameter("end", end);
-        List<Detection> result = query.getResultList();
+        final List<SqlDetection> result = query.getResultList();
         session.close();
 
         return result;

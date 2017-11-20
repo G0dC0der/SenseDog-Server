@@ -15,14 +15,14 @@ public class Mapper {
         MAPPER.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
     }
 
-    public static Map<?, ?> toMap(Object obj) {
+    public static Map<?, ?> toMap(final Object obj) {
         return MAPPER.convertValue(obj, Map.class);
     }
 
-    public static String stringify(Object object) {
+    public static String stringify(final Object object) {
         try {
             return MAPPER.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
