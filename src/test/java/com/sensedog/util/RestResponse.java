@@ -1,4 +1,4 @@
-package com.sensedog.rest.client;
+package com.sensedog.util;
 
 import com.sensedog.rest.model.ApiError;
 

@@ -1,9 +1,10 @@
-package com.sensedog.rest.client;
+package com.sensedog.util.client;
 
 import com.sensedog.rest.model.request.ApiAlarmCreate;
 import com.sensedog.rest.model.request.ApiDetect;
 import com.sensedog.rest.model.ApiServiceCreate;
 import com.sensedog.rest.model.ApiSeverity;
+import com.sensedog.util.RestResponse;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;

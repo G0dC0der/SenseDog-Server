@@ -1,4 +1,4 @@
-package com.sensedog.test;
+package com.sensedog.util;
 
 import java.util.Random;
 

@@ -1,8 +1,8 @@
 package com.sensedog;
 
-import com.sensedog.rest.client.AlarmResourceClient;
-import com.sensedog.rest.client.MasterUserResourceClient;
-import com.sensedog.rest.client.RestResponse;
+import com.sensedog.util.client.AlarmResourceClient;
+import com.sensedog.util.client.MasterUserResourceClient;
+import com.sensedog.util.RestResponse;
 import com.sensedog.rest.model.request.ApiAlarmCreate;
 import com.sensedog.rest.model.request.ApiConnect;
 import com.sensedog.rest.model.request.ApiDetect;
@@ -11,14 +11,14 @@ import com.sensedog.rest.model.ApiServiceCreate;
 import com.sensedog.rest.model.ApiServices;
 import com.sensedog.rest.model.ApiSeverity;
 import com.sensedog.rest.model.ApiToken;
-import com.sensedog.test.EntryUtil;
+import com.sensedog.util.EntryUtil;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class MasterServiceTest {
+public class MasterServiceIT {
 
     private MasterUserResourceClient masterClient;
     private AlarmResourceClient alarmClient;

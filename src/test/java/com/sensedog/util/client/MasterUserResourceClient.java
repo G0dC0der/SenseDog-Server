@@ -1,10 +1,11 @@
-package com.sensedog.rest.client;
+package com.sensedog.util.client;
 
 import com.sensedog.rest.model.request.ApiConnect;
 import com.sensedog.rest.model.request.ApiInvite;
 import com.sensedog.rest.model.request.ApiMasterUserCreate;
 import com.sensedog.rest.model.ApiServices;
 import com.sensedog.rest.model.ApiToken;
+import com.sensedog.util.RestResponse;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;

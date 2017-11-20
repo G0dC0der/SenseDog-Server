@@ -1,4 +1,4 @@
-package com.sensedog.security;
+package com.sensedog;
 
 import com.sensedog.detection.DetectionType;
 import com.sensedog.detection.Severity;
@@ -7,7 +7,8 @@ import com.sensedog.repository.ServiceRepository;
 import com.sensedog.repository.model.SqlDetection;
 import com.sensedog.repository.model.SqlPincode;
 import com.sensedog.repository.model.SqlService;
-import com.sensedog.test.EntryUtil;
+import com.sensedog.security.SecurityManager;
+import com.sensedog.util.EntryUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

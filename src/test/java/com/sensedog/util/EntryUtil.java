@@ -1,4 +1,4 @@
-package com.sensedog.test;
+package com.sensedog.util;
 
 import com.sensedog.detection.DetectionType;
 import com.sensedog.repository.model.SqlDetection;
@@ -8,8 +8,8 @@ import com.sensedog.rest.model.request.ApiMasterUserCreate;
 
 import java.time.ZonedDateTime;
 
-import static com.sensedog.test.Strings.junk;
-import static com.sensedog.test.Strings.numbers;
+import static com.sensedog.util.Strings.junk;
+import static com.sensedog.util.Strings.numbers;
 
 public class EntryUtil {
 
