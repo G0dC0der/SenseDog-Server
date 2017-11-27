@@ -17,7 +17,6 @@ import com.sensedog.service.UserService;
 import com.sensedog.util.PropertyUtil;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.hibernate.SessionFactory;
 
@@ -31,8 +30,6 @@ public class SystemBootstrap extends ResourceConfig {
     SystemBootstrap(@Context final ServiceLocator locator) {
         register(AlarmEndpoint.class);
         register(MasterEndpoint.class);
-        register(StatusEndpoint.class);
-        register(JacksonFeature.class);
 
         packages(true, "com.sensedog");
 
